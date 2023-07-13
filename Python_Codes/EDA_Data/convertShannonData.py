@@ -13,8 +13,6 @@
 # ---
 
 # %%
-
-# %%
 import pandas as pd
 import numpy as np
 import os
@@ -26,8 +24,6 @@ Min_data_dir_base = data_dir_base + "Min_Data/"
 
 reOrganized_dir = data_dir_base + "reOrganized/"
 os.makedirs(reOrganized_dir, exist_ok=True)
-
-# %%
 
 # %% [markdown]
 # ## We just need sheet A (beef cows) from CATINV
