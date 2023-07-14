@@ -359,30 +359,6 @@ county_adjacency.to_csv(f, index=False)
 # %%
 
 # %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
-
-# %%
 column_names = ["county"] + list(county_adjacency.county_name.unique())
 
 adjacency_binary_matrix = pd.DataFrame(columns=column_names)
@@ -391,20 +367,175 @@ adjacency_binary_matrix["county"] = list(county_adjacency.county_name.unique())
 adjacency_binary_matrix.fillna(0, inplace=True)
 adjacency_binary_matrix.head(4)
 
-# %%
-
-# %%
 for a_county in list(county_adjacency.county_name.unique()):
     curr_slice = county_adjacency[county_adjacency.county_name==a_county]
     curr_neighbors = list(curr_slice.neighbor_name)
     adjacency_binary_matrix.loc[adjacency_binary_matrix.county==a_county, curr_neighbors] = 1
+
+# %%
+adjacency_binary_matrix
+
+# %% [markdown]
+# # Save all binary adjacency matrix
+
+# %%
+import os, sys, pickle
+from datetime import datetime
+
+# %%
+filename = rangeland_dir + "county_adjacency_binary_matrix.sav"
+
+export_ = {"adjacency_binary_matrix": adjacency_binary_matrix, 
+           "source_code" : "all_grids_in_2directories_CountyAdjacency",
+           "Author": "HN",
+           "Date" : datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+pickle.dump(export_, open(filename, 'wb'))
+
+# %%
+county_states = county_adjacency.county_name.str.split(pat=", ", expand=True)[1]
+countyNeighbors_states = county_adjacency.neighbor_name.str.split(pat=", ", expand=True)[1]
+county_adjacency["county_states"] = county_states
+county_adjacency["countyNeighbors_states"] = countyNeighbors_states
+county_adjacency.head(2)
+
+# %% [markdown]
+# # Subset 25 states and create binary adjacency matrix
+
+# %%
+state_to_abbrev = {"Alabama": "AL", "Alaska": "AK", "Arizona": "AZ",
+                   "Arkansas": "AR", "California": "CA", "Colorado": "CO",
+                   "Connecticut": "CT", "Delaware": "DE", "Florida": "FL",
+                   "Georgia": "GA", "Hawaii": "HI", "Idaho": "ID",
+                   "Illinois": "IL", "Indiana": "IN", "Iowa": "IA",
+                   "Kansas": "KS", "Kentucky": "KY",    "Louisiana": "LA",
+                   "Maine": "ME",    "Maryland": "MD",    "Massachusetts": "MA",
+                   "Michigan": "MI",    "Minnesota": "MN",    "Mississippi": "MS",
+                   "Missouri": "MO",    "Montana": "MT",    "Nebraska": "NE",
+                   "Nevada": "NV",    "New Hampshire": "NH",    "New Jersey": "NJ",
+                   "New Mexico": "NM",    "New York": "NY",    "North Carolina": "NC",
+                   "North Dakota": "ND",    "Ohio": "OH",    "Oklahoma": "OK",
+                   "Oregon": "OR",    "Pennsylvania": "PA",    "Rhode Island": "RI",
+                   "South Carolina": "SC",    "South Dakota": "SD",    "Tennessee": "TN",
+                   "Texas": "TX",    "Utah": "UT",    "Vermont": "VT",
+                   "Virginia": "VA",    "Washington": "WA",    "West Virginia": "WV",
+                   "Wisconsin": "WI",    "Wyoming": "WY",    "District of Columbia": "DC",
+                   "American Samoa": "AS",    "Guam": "GU",    "Northern Mariana Islands": "MP",
+                   "Puerto Rico": "PR",    "United States Minor Outlying Islands": "UM",    
+                   "U.S. Virgin Islands": "VI"}
+
+states_abb_list = [ 'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', 'GA',
+                    'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME',
+                    'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM',
+                    'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX',
+                    'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
+
+abb_2_full_dict = {'AK': 'Alaska',    'AL': 'Alabama',    'AR': 'Arkansas',    
+                   'AZ': 'Arizona',    'CA': 'California',    'CO': 'Colorado',
+                   'CT': 'Connecticut',    'DC': 'District of Columbia',    'DE': 'Delaware',
+                   'FL': 'Florida',    'GA': 'Georgia',    'HI': 'Hawaii',
+                   'IA': 'Iowa',    'ID': 'Idaho',    'IL': 'Illinois',
+                   'IN': 'Indiana',    'KS': 'Kansas',    'KY': 'Kentucky',
+                   'LA': 'Louisiana',    'MA': 'Massachusetts',    'MD': 'Maryland',
+                   'ME': 'Maine',    'MI': 'Michigan',    'MN': 'Minnesota',
+                   'MO': 'Missouri',    'MS': 'Mississippi',    'MT': 'Montana',
+                   'NC': 'North Carolina',    'ND': 'North Dakota',    'NE': 'Nebraska',
+                   'NH': 'New Hampshire',    'NJ': 'New Jersey',    'NM': 'New Mexico',
+                   'NV': 'Nevada',    'NY': 'New York',    'OH': 'Ohio',
+                   'OK': 'Oklahoma',    'OR': 'Oregon',    'PA': 'Pennsylvania',    'RI': 'Rhode Island',
+                   'SC': 'South Carolina',    'SD': 'South Dakota',    'TN': 'Tennessee',
+                   'TX': 'Texas',    'UT': 'Utah',    'VA': 'Virginia',
+                   'VT': 'Vermont',    'WA': 'Washington',    'WI': 'Wisconsin',
+                   'WV': 'West Virginia',    'WY': 'Wyoming'}
+
+# %%
+state_25_abb = [state_to_abbrev[x] for x in states_25]
+
+# %%
+#### We can look at counties in a given state when they have neighbors in another state
+#### We do that in this cell. However, I think we need to strict our attention to the 
+#### targeted states. i.e. the neighbors should be also inside those states!
+"""
+county_adjacency_25states = county_adjacency[county_adjacency.county_states.isin(state_25_abb)].copy()
+county_adjacency_25states.reset_index(drop=True, inplace=True)
+
+column_names = ["county"] + list(county_adjacency_25states.neighbor_name.unique())
+
+adjacency_binary_matrix_25states = pd.DataFrame(columns=column_names)
+adjacency_binary_matrix_25states["county"] = list(county_adjacency_25states.county_name.unique())
+
+adjacency_binary_matrix_25states.fillna(0, inplace=True)
+adjacency_binary_matrix_25states.head(4)
+print (f"{adjacency_binary_matrix_25states.shape = }")
+
+for a_county in list(county_adjacency_25states.county_name.unique()):
+    curr_slice = county_adjacency_25states[county_adjacency_25states.county_name==a_county]
+    curr_neighbors = list(curr_slice.neighbor_name)
+    adjacency_binary_matrix_25states.loc[adjacency_binary_matrix_25states.county==a_county, curr_neighbors] = 1
     
+adjacency_binary_matrix_25states.shape
+"""
 
 # %%
-curr_slice
+county_adjacency_25states = county_adjacency[county_adjacency.county_states.isin(state_25_abb)].copy()
+
+print (county_adjacency_25states.shape)
+county_adjacency_25states = county_adjacency_25states[
+                                 county_adjacency_25states.countyNeighbors_states.isin(state_25_abb)].copy()
+
+print (county_adjacency_25states.shape)
+
+county_adjacency_25states.reset_index(drop=True, inplace=True)
+
+column_names = ["county"] + list(county_adjacency_25states.neighbor_name.unique())
+
+adjacency_binary_matrix_25states = pd.DataFrame(columns=column_names)
+adjacency_binary_matrix_25states["county"] = list(county_adjacency_25states.county_name.unique())
+
+adjacency_binary_matrix_25states.fillna(0, inplace=True)
+adjacency_binary_matrix_25states.head(4)
+print (f"{adjacency_binary_matrix_25states.shape = }")
+
+for a_county in list(county_adjacency_25states.county_name.unique()):
+    curr_slice = county_adjacency_25states[county_adjacency_25states.county_name==a_county]
+    curr_neighbors = list(curr_slice.neighbor_name)
+    adjacency_binary_matrix_25states.loc[adjacency_binary_matrix_25states.county==a_county, curr_neighbors] = 1
+    
+adjacency_binary_matrix_25states.shape
 
 # %%
-curr_neighbors
+filename = rangeland_dir + "adjacency_binary_matrix_strict25states.sav"
+
+export_ = {"adjacency_binary_matrix_strict25states": adjacency_binary_matrix_25states, 
+           "source_code" : "all_grids_in_2directories_CountyAdjacency",
+           "Author": "HN",
+           "Date" : datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+pickle.dump(export_, open(filename, 'wb'))
+
+# %%
+
+
+
+
+
+# %%
+
+# %%
+county_adjacency_25states.shape
+
+# %%
+
+# %%
+len(list(county_adjacency_25states.neighbor_name.unique()))
+
+# %%
+adjacency_binary_matrix.shape
+
+# %%
+adjacency_binary_matrix_25states.shape
+
+# %%
 
 # %%
 adjacency_binary_matrix.loc[adjacency_binary_matrix.county==a_county, curr_neighbors]
