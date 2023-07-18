@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --partition=rajagopalan,cahnrs,cahnrs_bigmem,cahnrs_gpu,kamiak,stockle
+#SBATCH --partition=kamiak,cahnrs,cahnrs_bigmem,cahnrs_gpu,stockle ##rajagopalan
 #SBATCH --requeue
 #SBATCH --job-name=SeasVGrid_outer # Job Name
 #SBATCH --time=00-12:00:00    # Wall clock time limit in Days-HH:MM:SS
@@ -12,8 +12,8 @@
 ####SBATCH --array=0-30000
 
 ###SBATCH -k o
-#SBATCH --output=/home/h.noorazar/rangeland/seasonal_variables/00_gridwise/error/01_gridwise_weatherVar_outer.o
-#SBATCH  --error=/home/h.noorazar/rangeland/seasonal_variables/00_gridwise/error/01_gridwise_weatherVar_outer.e
+#SBATCH --output=/home/h.noorazar/rangeland/seasonal_variables/01_mean_over_county/error/outer_seasVar_countyAgg.o
+#SBATCH  --error=/home/h.noorazar/rangeland/seasonal_variables/01_mean_over_county/error/outer_seasVar_countyAgg.e
 echo
 echo "--- We are now in $PWD, running an R script ..."
 echo
@@ -25,7 +25,7 @@ module load r/4.1.0
 ## cd /data/project/agaid/AnalogData_Sid/Creating_Variables_old/
 ### Rscript --vanilla ./sid_script_west_model_pr_ch.R ${SLURM_ARRAY_TASK_ID}
 
-Rscript --vanilla /home/h.noorazar/rangeland/seasonal_variables/00_gridwise/d_seasonal_vars_gridwise.R a_state
+Rscript --vanilla /home/h.noorazar/rangeland/seasonal_variables/01_mean_over_county/d_seasonal_vars_countyAgg.R a_state
 
 echo
 echo "----- DONE -----"

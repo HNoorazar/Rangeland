@@ -87,9 +87,12 @@ for (a_file in curr_state_grids$grid){
 }
 
 missing_grids <- na.omit(missing_grids)
-write.csv(missing_grids, 
-          file = paste0(out_dir, gsub(" ", "_", a_state), "_missing_grids_from_binary_path_1.csv"), 
-          row.names=FALSE)
+
+if (nrow(missing_grids) > 0){
+  write.csv(missing_grids, 
+            file = paste0(out_dir, gsub(" ", "_", a_state), "_missing_grids_from_binary_path_1.csv"), 
+            row.names=FALSE)
+}
 
 
 # How long did it take?
