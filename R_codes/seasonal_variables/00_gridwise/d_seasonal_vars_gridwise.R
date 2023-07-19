@@ -75,7 +75,9 @@ missing_grids$missing_grids_from_binary_path_1 = as.character(missing_grids$miss
 
 for (a_file in curr_state_grids$grid){
   if (file.exists(paste0(binary_path_1, a_file))){
-    curr_loc_dt <- seasonal_weather_aggregate_oneLoc(path_=binary_path_1, file_name=a_file, data_type_="observed")
+    curr_loc_dt <- seasonal_weather_aggregate_oneLoc(path_=binary_path_1, 
+                                                     file_name=a_file, 
+                                                     start_year = 1979, end_year = 2019)
     write.csv(curr_loc_dt, 
               file = paste0(out_dir, a_file, ".csv"), 
               row.names=FALSE)

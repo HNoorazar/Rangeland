@@ -6,7 +6,7 @@ binary_source_path = "/home/h.noorazar/Sid/sidFabio/read_binary_core.R" # Kamiak
 source(binary_source_path)
 options(digits=9)
 
-seasonal_weather_aggregate_oneLoc <- function(path_, file_name, data_type_){
+seasonal_weather_aggregate_oneLoc <- function(path_, file_name, start_year, end_year){
 
   #
   # Here we aggregate seasonal weather for one location and then we will
@@ -38,10 +38,10 @@ seasonal_weather_aggregate_oneLoc <- function(path_, file_name, data_type_){
   
   # data_type_ is model type; observed modeled_hist, or GFDL-ESM2M HadGEM2-ES365 MIROC-ESM-CHEM IPSL-CM5A-LR NorESM1-M
   # to use right time span of the binary files
-  met_data <- read_binary(file_path = paste0(path_, file_name), 
-                          data_type = data_type_, 
-                          no_vars = no_vars_)
-
+  met_data <- read_binary_new(file_path = paste0(path_, file_name), 
+                              no_vars = no_vars_,
+                              start_year = start_year,
+                              end_year = end_year)
 
   met_data$Tavg = (met_data$tmax + met_data$tmin)/2
   met_data <- add_seasons(met_data)
