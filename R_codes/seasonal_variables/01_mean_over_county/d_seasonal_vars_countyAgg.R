@@ -57,7 +57,7 @@ if (dir.exists(out_dir) == F) {
 #
 #   Define parameters
 #
-grids_25states <- data.table(read.csv(paste0(param_dir, "grids_25states.csv")))
+grids_25states <- data.table(read.csv(paste0(param_dir, "Bhupi_25states_clean.csv")))
 curr_state_grids = grids_25states[grids_25states$state==a_state]
 
 ####

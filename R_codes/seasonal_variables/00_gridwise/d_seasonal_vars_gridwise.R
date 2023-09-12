@@ -65,7 +65,7 @@ if (dir.exists(out_dir) == F) {
 #
 model_type = "observed"
 
-grids_25states <- data.table(read.csv(paste0(param_dir, "grids_25states.csv")))
+grids_25states <- data.table(read.csv(paste0(param_dir, "Bhupi_gridMET_counties_state.csv")))
 curr_state_grids = grids_25states[grids_25states$state==a_state]
 
 missing_count <- 0

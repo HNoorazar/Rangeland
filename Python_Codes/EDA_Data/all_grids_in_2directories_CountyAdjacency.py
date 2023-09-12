@@ -57,7 +57,12 @@ Supriya_FIPS.rename(columns={"name": "county",
                              "name_1": "state_full_name"}, inplace=True)
 Supriya_FIPS["county_name"] = Supriya_FIPS["county"] + ", " + Supriya_FIPS["state"]
 
+
 Supriya_FIPS
+
+# %%
+f = rangeland_dir + "Supriya_FIPS_clean.csv"
+Supriya_FIPS.to_csv(f, index=False)
 
 # %%
 print (f"{len(sorted(list(Supriya_FIPS.state.unique()))) = }")
@@ -82,6 +87,10 @@ missing_fips = Supriya_FIPS[~Supriya_FIPS.fips.isin(list(FIPS.fips))].copy()
 FIPS = pd.concat([FIPS, missing_fips[["state", "county", "fips", "county_name"]]], ignore_index = True)
 FIPS.reset_index(drop=True, inplace=True)
 FIPS.head(2)
+
+# %%
+f = rangeland_dir + "Supriya_Min_FIPS.csv"
+FIPS.to_csv(f, index=False)
 
 # %%
 all_grids_in_2directories = pd.read_csv(research_dir + "all_grids_in_2directories.csv")
