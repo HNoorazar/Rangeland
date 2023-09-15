@@ -19,7 +19,8 @@
 # %%
 import pandas as pd
 import numpy as np
-import os
+from datetime import datetime
+import os, pickle
 
 # %%
 # import geopandas
@@ -40,16 +41,23 @@ Min_data_dir_base = data_dir_base + "Min_Data/"
 reOrganized_dir = data_dir_base + "reOrganized/"
 
 # %%
-file_name = "countyMean_seasonalVars_wFips.csv"
-countyMean_seasonalVars = pd.read_csv(reOrganized_dir + "seasonal_variables/02_merged_mean_over_county/" + file_name)
-print (f"{len(countyMean_seasonalVars.state.unique())=}")
+# file_name = "countyMean_seasonalVars_wFips.csv"
+# countyMean_seasonalVars = pd.read_csv(reOrganized_dir + 
+#                                        "seasonal_variables/02_merged_mean_over_county/" + file_name)
+# print (f"{len(countyMean_seasonalVars.state.unique())=}")
 
-# round numbers
-countyMean_seasonalVars = countyMean_seasonalVars.round(decimals=2)
-countyMean_seasonalVars.head(2)
+# # round numbers
+#  = countyMean_seasonalVars.round(decimals=2)
+# countyMean_seasonalVars.head(2)
 
 # %%
-countyMean_seasonalVars.head(2)
+# file_name = "countyMean_seasonalVars_wFips.sav"
+# countyMean_seasonalVars = pickle.load(open(reOrganized_dir + \
+#                                            "seasonal_variables/02_merged_mean_over_county/" \
+#                                            + file_name, "rb"))
+# del(file_name)
+# countyMean_seasonalVars = countyMean_seasonalVars["countyMean_seasonalVars_wFips"]
+# countyMean_seasonalVars.head(2)
 
 # %%
 FIPS = pd.read_csv("/Users/hn/Documents/01_research_data/Sid/Analog/parameters/Min_counties.csv")
@@ -59,168 +67,130 @@ FIPS.reset_index(drop=True, inplace=True)
 FIPS.head(2)
 
 # %%
-SoI = ["Alabama", "Arkansas", "California", "Colorado", "Florida", "Georgia",
-       "Idaho", "Illinois", "Iowa", "Kansas", "Kentucky", "Louisiana", "Mississippi",
-       "Missouri", "Montana", "Nebraska", "New_Mexico",
-       "North_Dakota", "Oklahoma", "Oregon", "South_Dakota", "Tennessee", "Texas", "Virginia", "Wyoming"]
+SoI = ["Alabama", "Arkansas", 
+       "California", "Colorado", 
+       "Florida", "Georgia",
+       "Idaho", "Illinois", 
+       "Iowa", "Kansas", 
+       "Kentucky", "Louisiana", 
+       "Mississippi", "Missouri", 
+       "Montana", "Nebraska", 
+       "New Mexico", "North Dakota", 
+       "Oklahoma", "Oregon", 
+       "South Dakota", "Tennessee", 
+       "Texas", "Virginia", "Wyoming"]
 
 # %%
 Bhupi = pd.read_csv(param_dir + "Bhupi_25states_clean.csv")
 Bhupi["SC"] = Bhupi.state + "-" + Bhupi.county
 Bhupi.head(2)
 
-# %% [markdown]
-# ### Reshape seasonal variables.
+# %%
 
 # %%
-# # 4 seasons will collapse into 1 row.
-# L = int(len(countyMean_seasonalVars)/4)
-# cntyMean_seasonVars_wide = pd.DataFrame(columns=["state", "county", "year"], index=range(L))
-# cntyMean_seasonVars_wide.state = "A"
-# cntyMean_seasonVars_wide.county = "A"
-# cntyMean_seasonVars_wide.year = 0
+cntyMean_seasonVars_wide = pickle.load(open(reOrganized_dir + \
+                                          "seasonal_variables/02_merged_mean_over_county/" + \
+                                          "wide_seasonal_vars_cntyMean_wFips.sav", "rb"))
+cntyMean_seasonVars_wide = cntyMean_seasonVars_wide["wide_seasonal_vars_cntyMean_wFips"]
 
-# print (f"{cntyMean_seasonVars_wide.shape = }")
-# cntyMean_seasonVars_wide.head(2)
-# # countyMean_seasonalVars[["state", "county", "year"]].copy()
-
-# season_list = ["S1", "S2", "S3", "S4"]
-# temp_list = ["countyMean_avg_Tavg"] * 4
-# temp_cols = [i + "_" + j for i, j in zip(season_list, temp_list)]
-
-# precip_list = ["countyMean_total_precip"] * 4
-# precip_cols = [i + "_" + j for i, j in zip(season_list, precip_list)]
-
-# cntyMean_seasonVars_wide[precip_cols + temp_cols] = -60
+# %%
+# cntyMean_seasonVars_wide = pd.read_csv(reOrganized_dir + "wide_seasonal_vars_cntyMean.csv")
 # cntyMean_seasonVars_wide.head(2)
 
-# countyMean_seasonalVars["state_county_year"] = countyMean_seasonalVars.state + "_" + \
-#                                                countyMean_seasonalVars.county + "_" + \
-#                                                countyMean_seasonalVars.year.astype("str")
-# countyMean_seasonalVars.head(2)
-
-
-# countyMean_seasonalVars[(countyMean_seasonalVars.state == "Alabama") & \
-#                         (countyMean_seasonalVars.county == "Madison") & \
-#                         (countyMean_seasonalVars.year == 1979)]
+# %%
+USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
 
 # %%
-# # %%time
-# wide_row_idx = 0
-# for a_slice_patt in countyMean_seasonalVars.state_county_year.unique():
-#     a_slice = countyMean_seasonalVars[countyMean_seasonalVars.state_county_year == a_slice_patt]
+feed_expense = USDA_data["feed_expense"]
+AgLand = USDA_data["AgLand"]
+wetLand_area = USDA_data["wetLand_area"]
 
-#     # populate the wide DF
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, "year"] = a_slice.year.iloc[0]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, "state"] = a_slice.state.iloc[0]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, "county"] = a_slice.county.iloc[0]
-    
-#     ### This is slow!!!
-#     # cntyMean_seasonVars_wide.loc[wide_row_idx, temp_cols] = a_slice["countyMean_avg_Tavg"].values
-#     # cntyMean_seasonVars_wide.loc[wide_row_idx, precip_cols] = a_slice["countyMean_total_precip"].values
-    
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, temp_cols[0]] = a_slice["countyMean_avg_Tavg"].values[0]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, temp_cols[1]] = a_slice["countyMean_avg_Tavg"].values[1]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, temp_cols[2]] = a_slice["countyMean_avg_Tavg"].values[2]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, temp_cols[3]] = a_slice["countyMean_avg_Tavg"].values[3]
-    
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, precip_cols[0]] = a_slice["countyMean_total_precip"].values[0]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, precip_cols[1]] = a_slice["countyMean_total_precip"].values[1]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, precip_cols[2]] = a_slice["countyMean_total_precip"].values[2]
-#     cntyMean_seasonVars_wide.loc[wide_row_idx, precip_cols[3]] = a_slice["countyMean_total_precip"].values[3]
-
-#     wide_row_idx += 1
-
-# cntyMean_seasonVars_wide = pd.merge(cntyMean_seasonVars_wide, 
-#                                     Bhupi[["state", "county", "county_fips"]].drop_duplicates(), 
-#                                     on=['state', 'county'], how='left')
-
-# out_name = reOrganized_dir + "wide_seasonal_vars_cntyMean.csv"
-# cntyMean_seasonVars_wide.to_csv(out_name, index = False)
-# It took [25 minutes] to run this cell
+# FarmOperation = USDA_data["FarmOperation"] # not needed. create by NASS guy.
 
 # %%
+feed_expense.head(2)
 
 # %%
-cntyMean_seasonVars_wide = pd.read_csv(reOrganized_dir + "wide_seasonal_vars_cntyMean.csv")
-cntyMean_seasonVars_wide.head(2)
+# feed_expense = pd.read_csv(reOrganized_dir + "USDA_feed_expense_cleaned_01.csv")
+# feed_expense.head(3)
 
 # %%
-feed_expense = pd.read_csv(reOrganized_dir + "USDA_feed_expense_cleaned_01.csv")
-feed_expense.head(3)
+feed_expense[(feed_expense.state=="Alabama") & (feed_expense.county=="Baldwin")]
 
 # %%
-len(feed_expense.state.unique())
+feed_expense[(feed_expense.state=="Alabama") & (feed_expense.county=="Washington")]
 
 # %%
-cntyMean_seasonVars_wide_stateCounty = cntyMean_seasonVars_wide.state + "_" + cntyMean_seasonVars_wide.county
-cntyMean_seasonVars_wide_stateCounty = list(cntyMean_seasonVars_wide_stateCounty.unique())
-len(cntyMean_seasonVars_wide_stateCounty)
+print (f"{len(feed_expense.state.unique())=}")
+feed_expense.data_item.unique()
 
 # %%
-feed_expense_stateCounty = feed_expense.state + "_" + feed_expense.county
-feed_expense_stateCounty = list(feed_expense_stateCounty.unique())
-len(feed_expense_stateCounty)
+feed_expense.rename(columns={"value":"feed_expense", 
+                             "cv_(%)":"feed_expense_cv_(%)"}, inplace=True)
+feed_expense.head(2)
 
 # %%
-missing = [x for x in cntyMean_seasonVars_wide_stateCounty if x not in feed_expense_stateCounty]
+feed_expense = feed_expense[feed_expense.state.isin(SoI)].copy()
 
 # %%
-missing
+### Subset seasonal vars to every 5 years that is in the USDA NASS
+USDA_years = list(feed_expense.year.unique())
+seasonal_5yearLapse = cntyMean_seasonVars_wide[cntyMean_seasonVars_wide.year.isin(USDA_years)].copy()
 
 # %%
-sorted(list(feed_expense[feed_expense.state == "Alabama"].county.unique()))
+seasonal_5yearLapse.head(2)
 
 # %%
-sorted(list(cntyMean_seasonVars_wide[cntyMean_seasonVars_wide.state == "Alabama"].county.unique()))
+feed_expense.head(2)
 
 # %%
-sorted(list(feed_expense[feed_expense.state == "Arkansas"].county.unique()))
+#
+# Merge seasonal variables and feed expenses.
+#
+need_cols = ["year", "county_fips", "feed_expense", "feed_expense_cv_(%)"]
+season_Feed = pd.merge(seasonal_5yearLapse, 
+                       feed_expense[need_cols].drop_duplicates(), 
+                       on=["year", "county_fips"], how='left')
+
+print (f"{seasonal_5yearLapse.shape = }")
+print (f"{feed_expense.shape = }")
+print (f"{season_Feed.shape = }")
+season_Feed.head(2)
 
 # %%
-sorted(list(cntyMean_seasonVars_wide[cntyMean_seasonVars_wide.state == "Arkansas"].county.unique()))
+feed_expense["FIPS_yr"] = feed_expense["county_fips"].astype(str)  + "_" + \
+                          feed_expense["year"].astype(str)
 
 # %%
+seasonal_5yearLapse["FIPS_yr"] = seasonal_5yearLapse["county_fips"].astype(str)  + "_" + \
+                                 seasonal_5yearLapse["year"].astype(str)
 
 # %%
-Supriya = pd.read_csv(param_dir + "bad_grids_25states.csv")
-Supriya.head(2)
+seasonal_5yearLapse
 
 # %%
+A = [x for x in list(seasonal_5yearLapse.FIPS_yr) if not (x in list(feed_expense.FIPS_yr))]
+len(A)
 
 # %%
-sorted(list(Bhupi.state.unique()))
+A[:10]
+
+# %%
+feed_expense[feed_expense.county_fips==6075]
+
+# %%
+seasonal_5yearLapse[seasonal_5yearLapse.county_fips==6075]
+
+# %%
+season_Feed[season_Feed.county_fips==6075]
+
+# %%
+wetLand_area = pd.read_csv(reOrganized_dir  + "USDA_wetLand_area_cleaned_01.csv")
+print (wetLand_area.data_item.unique())
+wetLand_area.head(5)
 
 # %%
 
 # %%
-Bhupi_AR = Bhupi[Bhupi.state == "Arkansas"].copy()
-sorted(list(Bhupi_AR.county.unique()))
-
-# %%
-Bhupi_TN = Bhupi[Bhupi.state == "Tennessee"].copy()
-sorted(list(Bhupi_TN.county.unique()))
-
-# %%
-Bhupi_stateCounty = Bhupi.state + "_" + Bhupi.county
-Bhupi_stateCounty = list(Bhupi_stateCounty.unique())
-len(Bhupi_stateCounty)
-
-# %%
-missing = [x for x in Bhupi_stateCounty if x not in feed_expense_stateCounty]
-missing
-
-# %%
-Bhupi_FL = Bhupi[Bhupi.state == "New Mexico"].copy()
-feed_expense_FL = feed_expense[feed_expense.state == "New Mexico"].copy()
-
-# %%
-sorted(list(Bhupi_FL.county.unique()))
-
-# %%
-sorted(list(feed_expense_FL.county.unique()))
-
-# %%
-Bhupi.head(2)
 
 # %%

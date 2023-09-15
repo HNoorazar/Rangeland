@@ -196,7 +196,7 @@ for idx in FarmOperation.index:
         
     if len(FarmOperation.loc[idx, "county_ansi"]) == 1:
         FarmOperation.loc[idx, "county_ansi"] = "00" + FarmOperation.loc[idx, "county_ansi"]
-    elif len(FarmOperation.loc[idx, "state_ansi"]) == 2:
+    elif len(FarmOperation.loc[idx, "county_ansi"]) == 2:
         FarmOperation.loc[idx, "county_ansi"] = "0" + FarmOperation.loc[idx, "county_ansi"]
 
 # %%
@@ -246,10 +246,19 @@ feed_expense.drop(bad_cols, axis="columns", inplace=True)
 FarmOperation.drop(bad_cols, axis="columns", inplace=True)
 
 # %%
+
+# %%
 AgLand.head(2)
 
 # %%
 # AgLand[AgLand['county_ansi'].isnull()]
+
+# %%
+feed_expense[(feed_expense.state=="CALIFORNIA") & (feed_expense.county=="SAN FRANCISCO")]
+
+# %%
+
+# %%
 
 # %%
 AgLand['county_ansi'].fillna(666, inplace=True)
@@ -269,7 +278,7 @@ for idx in AgLand.index:
         
     if len(AgLand.loc[idx, "county_ansi"]) == 1:
         AgLand.loc[idx, "county_ansi"] = "00" + AgLand.loc[idx, "county_ansi"]
-    elif len(AgLand.loc[idx, "state_ansi"]) == 2:
+    elif len(AgLand.loc[idx, "county_ansi"]) == 2:
         AgLand.loc[idx, "county_ansi"] = "0" + AgLand.loc[idx, "county_ansi"]
 
 AgLand["county_fips"] = AgLand["state_ansi"] + AgLand["county_ansi"]
@@ -295,13 +304,11 @@ for idx in wetLand_area.index:
         
     if len(wetLand_area.loc[idx, "county_ansi"]) == 1:
         wetLand_area.loc[idx, "county_ansi"] = "00" + wetLand_area.loc[idx, "county_ansi"]
-    elif len(wetLand_area.loc[idx, "state_ansi"]) == 2:
+    elif len(wetLand_area.loc[idx, "county_ansi"]) == 2:
         wetLand_area.loc[idx, "county_ansi"] = "0" + wetLand_area.loc[idx, "county_ansi"]
 
 wetLand_area["county_fips"] = wetLand_area["state_ansi"] + wetLand_area["county_ansi"]
 wetLand_area[["state", "county", "state_ansi", "county_ansi", "county_fips"]].head(5)
-
-# %%
 
 # %%
 feed_expense['county_ansi'].fillna(666, inplace=True)
@@ -321,7 +328,7 @@ for idx in feed_expense.index:
         
     if len(feed_expense.loc[idx, "county_ansi"]) == 1:
         feed_expense.loc[idx, "county_ansi"] = "00" + feed_expense.loc[idx, "county_ansi"]
-    elif len(feed_expense.loc[idx, "state_ansi"]) == 2:
+    elif len(feed_expense.loc[idx, "county_ansi"]) == 2:
         feed_expense.loc[idx, "county_ansi"] = "0" + feed_expense.loc[idx, "county_ansi"]
         
         
@@ -329,6 +336,7 @@ feed_expense["county_fips"] = feed_expense["state_ansi"] + feed_expense["county_
 feed_expense[["state", "county", "state_ansi", "county_ansi", "county_fips"]].head(5)
 
 # %%
+feed_expense[(feed_expense.state=="Alabama") & (feed_expense.county=="Washington")]
 
 # %%
 # AgLand.drop(["county_ansi", "state_ansi", "ag_district_code"], axis="columns", inplace=True)
@@ -337,17 +345,27 @@ feed_expense[["state", "county", "state_ansi", "county_ansi", "county_fips"]].he
 # FarmOperation.drop(["county_ansi", "state_ansi", "ag_district_code"], axis="columns", inplace=True)
 
 # %%
+# AgLand.to_csv(reOrganized_dir + "USDA_AgLand_cleaned_01.csv", index=False)
+# wetLand_area.to_csv(reOrganized_dir  + "USDA_wetLand_area_cleaned_01.csv",  index=False)
+# feed_expense.to_csv(reOrganized_dir  + "USDA_feed_expense_cleaned_01.csv",  index=False)
+# FarmOperation.to_csv(reOrganized_dir + "USDA_FarmOperation_cleaned_01.csv", index=False)
+
+
+import pickle
+from datetime import datetime
+
+filename = reOrganized_dir + "USDA_data.sav"
+
+export_ = {"AgLand": AgLand, "wetLand_area": wetLand_area, 
+           "feed_expense": feed_expense, "FarmOperation": FarmOperation, 
+           "source_code" : "00_clean_USDA_data_addFIPS",
+           "Author": "HN",
+           "Date" : datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+pickle.dump(export_, open(filename, 'wb'))
 
 # %%
-FarmOperation.head(2)
-
-# %%
-AgLand.to_csv(reOrganized_dir + "USDA_AgLand_cleaned_01.csv", index=False)
-wetLand_area.to_csv(reOrganized_dir + "USDA_wetLand_area_cleaned_01.csv", index=False)
-feed_expense.to_csv(reOrganized_dir + "USDA_feed_expense_cleaned_01.csv", index=False)
-FarmOperation.to_csv(reOrganized_dir + "USDA_FarmOperation_cleaned_01.csv", index=False)
-
-# %%
+feed_expense.county_fips[1]
 
 # %% [markdown]
 # # Tonsor
