@@ -20,7 +20,7 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import os, pickle
+import os, pickle, sys
 
 # %%
 # import geopandas
@@ -193,6 +193,7 @@ season_Feed_CRP = pd.merge(season_Feed,
 del(need_cols)
 
 # %%
+wetLand_area.year.unique()
 
 # %%
 print (f"{season_Feed.shape = }")
@@ -213,26 +214,167 @@ print ("AgLand.data_item are {}".format(list(AgLand.data_item.unique())))
 print ()
 AgLand.head(2)
 
-# %%
-irrigated = AgLand[AgLand.data_item == "AG LAND, IRRIGATED - ACRES"].copy()
-irrigated.reset_index(drop=True, inplace=True)
-irrigated.head(2)
+# %% [markdown]
+# # TEST
+#
+# Test and see what are the ```data_item```s here. Do they reflect percentages in WA counties?
+#
+# We need to add those in terms of percentage not absolute values.
 
 # %%
-if "value" in irrigated.columns:
-    irrigated.rename(columns={"value":"irrigated_area", 
-                                 "cv_(%)":"irrigated_area_cv_(%)"}, 
+# COI = ['Adams', 'Benton', 'Franklin', 'Grant', 'Walla Walla', 'Yakima']
+
+# WSDA_SF_data_dir = "/Users/hn/Documents/01_research_data/00_shapeFiles/01_shapefiles_data_part_not_filtered/"
+# WSDA_SF_data_dir_2 = "/Users/hn/Documents/01_research_data/NASA/data_part_of_shapefile/"
+
+# WSDA_2018 = pd.read_csv(WSDA_SF_data_dir + "WSDA_DataTable_2018.csv")
+# print (WSDA_2018.county.unique())
+# WSDA_2018.head(2)
+
+# %%
+# WSDA_2018 = WSDA_2018[WSDA_2018.county.isin(COI)]
+# len(WSDA_2018.ID.unique())
+
+# %%
+# all_eastern = pd.read_csv(WSDA_SF_data_dir_2 + "all_SF_data_concatenated.csv")
+
+# all_eastern["SF_year"] = all_eastern.ID.str.split("_", expand=True)[3]
+# all_eastern["SF_year"] = all_eastern["SF_year"].astype(int)
+
+# all_eastern_2018 = all_eastern[all_eastern.SF_year == 2018].copy()
+# print (len(all_eastern_2018.ID.unique()))
+# print (all_eastern_2018.county.unique())
+# all_eastern.head(2)
+
+# %%
+# all_eastern_total_Acr_perCounty = all_eastern[["ExctAcr", "county"]].groupby(["county"]).sum().reset_index()
+# all_eastern_2018_total_Acr_perCounty = all_eastern_2018[["ExctAcr", "county"]].groupby(
+#                                                            ["county"]).sum().reset_index()
+# WSDA_2018_total_Acr_perCounty = WSDA_2018[["ExctAcr", "county"]].groupby(["county"]).sum().reset_index()
+
+# %%
+# sys.path.append('/Users/hn/Documents/00_GitHub/Ag/NASA/Python_codes/')
+# import NASA_core as nc
+# all_eastern_irr = nc.filter_out_nonIrrigated(all_eastern)
+# all_eastern_2018_irr = nc.filter_out_nonIrrigated(all_eastern_2018)
+
+# print (f"{all_eastern.shape = }")
+# print (f"{all_eastern_irr.shape = }")
+# all_eastern_irr.head(2)
+
+# all_eastern_irr_Acr_perCounty = all_eastern_irr[["ExctAcr", "county"]].groupby(["county"]).sum().reset_index()
+# all_eastern_2018_irr_Acr_perCounty = all_eastern_2018_irr[["ExctAcr", "county"]].groupby(["county"]
+#                                                                                         ).sum().reset_index()
+
+# all_eastern_irr_Acr_perCounty.rename(columns={"ExctAcr":"irr_area"}, inplace=True)
+# all_eastern_2018_irr_Acr_perCounty.rename(columns={"ExctAcr":"irr_area"}, inplace=True)
+
+# %%
+# WSDA_areas_df = pd.merge(all_eastern_total_Acr_perCounty, 
+#                          all_eastern_irr_Acr_perCounty, 
+#                          on=["county"], how='left')
+# WSDA_areas_df["irr_as_perc"] = (WSDA_areas_df.irr_area / WSDA_areas_df.ExctAcr)*100
+# WSDA_areas_df.iloc[:, 1:] = WSDA_areas_df.iloc[:, 1:].round(2)
+# WSDA_areas_df
+
+# WSDA_2018_irr = nc.filter_out_nonIrrigated(WSDA_2018)
+# WSDA_2018_irr_Acr_perCounty = WSDA_2018_irr[["ExctAcr", "county"]].groupby(["county"]).sum().reset_index()
+# WSDA_2018_irr_Acr_perCounty.rename(columns={"ExctAcr":"irr_area"}, inplace=True)
+# WSDA_2018_irr_Acr_perCounty
+
+# WSDA_2018_areas_df = pd.merge(WSDA_2018_total_Acr_perCounty, 
+#                               WSDA_2018_irr_Acr_perCounty, 
+#                               on=["county"], how='left')
+# WSDA_2018_areas_df["irr_as_perc"] = (WSDA_2018_areas_df.irr_area / WSDA_2018_areas_df.ExctAcr)*100
+# WSDA_2018_areas_df.iloc[:, 1:] = WSDA_2018_areas_df.iloc[:, 1:].round(2)
+# WSDA_2018_areas_df
+
+# %%
+# AgLand_WA = AgLand[AgLand.state == "Washington"].copy()
+# AgLand_WA.rename(columns={"value":"area"}, inplace=True)
+# AgLand_WA.area = AgLand_WA.area.replace(',','', regex=True)
+# AgLand_WA.area = AgLand_WA.area.astype(int)
+# AgLand_WA = AgLand_WA[AgLand_WA.county.isin(COI)]
+# AgLand_irrigated_WA = AgLand_WA[AgLand_WA.data_item == "AG LAND, IRRIGATED - ACRES"].copy()
+# AgLand_irrigated_WA.reset_index(drop=True, inplace=True)
+
+# AgLand_FarmOper_WA = AgLand_WA[AgLand_WA.data_item == "FARM OPERATIONS - ACRES OPERATED"].copy()
+# AgLand_FarmOper_WA.reset_index(drop=True, inplace=True)
+
+# print (AgLand_irrigated_WA.shape)
+# AgLand_irrigated_WA.head(2)
+
+# %%
+# AgLand_FarmOper_WA.head(2)
+
+# %%
+# AgLand_WA_FarmOper_acr_perCounty = AgLand_FarmOper_WA[["county", "area", "year"]].groupby(
+#                                                     ["county", "year"]).sum().reset_index()
+# AgLand_WA_FarmOper_acr_perCounty.head(2)
+
+# %%
+
+# %%
+# AgLand_WA_irr_acr_perCounty = AgLand_irrigated_WA[["county", "area", "year"]].groupby(
+#                                                      ["county", "year"]).sum().reset_index()
+# AgLand_WA_irr_acr_perCounty.rename(columns={"area":"irr_area"}, inplace=True)
+
+# %%
+# Agland_areas_df = pd.merge(AgLand_WA_total_acr_perCounty, 
+#                            AgLand_WA_irr_acr_perCounty, 
+#                            on=["county", "year"], how='left')
+# Agland_areas_df["irr_as_perc"] = (Agland_areas_df.irr_area / Agland_areas_df.area)*100
+# Agland_areas_df.iloc[:, 1:] = Agland_areas_df.iloc[:, 1:].round(2)
+# Agland_areas_df.head(10)
+
+# %%
+# Agland_areas_df2 = pd.merge(AgLand_WA_FarmOper_acr_perCounty, 
+#                             AgLand_WA_irr_acr_perCounty, 
+#                             on=["county", "year"], how='left')
+# Agland_areas_df2["irr_as_perc"] = (Agland_areas_df2.irr_area / Agland_areas_df2.area)*100
+# Agland_areas_df2.iloc[:, 1:] = Agland_areas_df2.iloc[:, 1:].round(2)
+# Agland_areas_df2.head(10)
+
+# %%
+AgLand_irrigated = AgLand[AgLand.data_item == "AG LAND, IRRIGATED - ACRES"].copy()
+AgLand_irrigated.reset_index(drop=True, inplace=True)
+AgLand_irrigated.head(2)
+
+# %%
+# if "value" in wetLand_area.columns:
+#     wetLand_area.rename(columns={"value":"irrigated_area", 
+#                                  "cv_(%)":"irrigated_area_cv_(%)"}, 
+#                         inplace=True)
+
+# print(f"{wetLand_area.data_item.unique() = }")
+# AgLand_irrigated.head(2)
+
+# %%
+# I do not know why I have "irrigated.columns" below.
+# GitHub said wetLand. So, I fixed it above.
+
+if "value" in AgLand_irrigated.columns:
+    AgLand_irrigated.rename(columns={"value":"irrigated_area", 
+                              "cv_(%)":"irrigated_area_cv_(%)"}, 
                         inplace=True)
 
-print(f"{irrigated.data_item.unique() = }")
-irrigated.head(2)
+print(f"{AgLand_irrigated.data_item.unique() = }")
+AgLand_irrigated.head(2)
+
+# %%
+season_Feed_CRP.head(2)
+
+# %%
+AgLand_irrigated.head(2)
 
 # %%
 need_cols = ["year", "county_fips", "irrigated_area", "irrigated_area_cv_(%)"]
 season_Feed_CRP_irr = pd.merge(season_Feed_CRP, 
-                               irrigated[need_cols].drop_duplicates(), 
+                               AgLand_irrigated[need_cols].drop_duplicates(), 
                                on=["year", "county_fips"], how='left')
 del(need_cols)
+
+# %%
 
 # %% [markdown]
 # ### County Population
@@ -404,30 +546,6 @@ for idx in pop_2010_2020.index:
     wide_pointer += 2
 
 # %%
-# pop_2000_2010.head(5)
-
-# %%
-# pop_wide.head(5)
-
-# %%
-# pop_2000_2010.tail(5)
-
-# %%
-# pop_wide.loc[2141*2-6:2141*2]
-
-# %%
-# pop_2010_2020.head(5)
-
-# %%
-# pop_wide.loc[2141*2:2141*2+5]
-
-# %%
-# pop_2010_2020.tail(5)
-
-# %%
-# pop_wide.tail(5)
-
-# %%
 season_Feed_CRP_irr.head(2)
 
 # %%
@@ -444,5 +562,32 @@ print (f"{season_Feed_CRP_pop.shape = }")
 season_Feed_CRP_pop.head(5)
 
 # %%
+# myAgland_WA = myAgland[myAgland.State == "ALABAMA"].copy()
+# myAgland_WA = myAgland_WA[myAgland_WA.County=="AUTAUGA"].copy()
+# myAgland_WA = myAgland_WA[~(myAgland_WA.Value == " (D)")].copy()
+# myAgland_WA.Value = myAgland_WA.Value.replace(',','', regex=True)
+# myAgland_WA.Value = myAgland_WA.Value.astype(int)
+# myAgland_WA[["Value", "County", "Year", "Data Item"]].groupby(["Data Item", "County", "Year"]).sum().reset_index()
+# myAgland_WA.head(2)
+
+# %%
+
+# %%
+# AgLand_NASS = AgLand[AgLand.state=="Alabama"].copy()
+# AgLand_NASS = AgLand_NASS[AgLand_NASS.county == "Autauga"].copy()
+# AgLand_NASS.value = AgLand_NASS.value.replace(',','', regex=True)
+# AgLand_NASS.value = AgLand_NASS.value.astype(int)
+
+# AgLand_NASS[["value", "county", "year"]].groupby(["county", "year"]).sum().reset_index()
+
+# %%
+
+# %%
+AgLand_WA = AgLand[AgLand.state == "Alabama"].copy()
+AgLand_WA = AgLand[AgLand.county == "Autauga"].copy()
+AgLand_WA.head(2)
+
+# %%
+AgLand_WA.year.unique()
 
 # %%
