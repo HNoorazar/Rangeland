@@ -99,6 +99,7 @@ USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
 feed_expense = USDA_data["feed_expense"]
 AgLand = USDA_data["AgLand"]
 wetLand_area = USDA_data["wetLand_area"]
+totalBeefCowInv = USDA_data["totalBeefCowInv"]
 # FarmOperation = USDA_data["FarmOperation"] # not needed. create by NASS guy.
 
 # %%
@@ -123,15 +124,19 @@ feed_expense.head(2)
 # %%
 feed_expense = feed_expense[feed_expense.state.isin(SoI)].copy()
 
+print (feed_expense.shape)
+print(len(feed_expense.state.unique()))
+print(len(feed_expense.county.unique()))
+print(len(feed_expense.year.unique()))
+
+feed_expense.head(2)
+
 # %%
 ### Subset seasonal vars to every 5 years that is in the USDA NASS
 USDA_years = list(feed_expense.year.unique())
 seasonal_5yearLapse = cntyMean_seasonVars_wide[cntyMean_seasonVars_wide.year.isin(USDA_years)].copy()
 seasonal_5yearLapse.reset_index(drop=True, inplace=True)
 seasonal_5yearLapse.head(2)
-
-# %%
-feed_expense.head(2)
 
 # %%
 #
@@ -186,6 +191,13 @@ print(f"{wetLand_area.data_item.unique() = }")
 wetLand_area.head(2)
 
 # %%
+wetLand_area_25state = wetLand_area[wetLand_area.state.isin(SoI)]
+print (wetLand_area_25state.shape)
+print(len(wetLand_area_25state.state.unique()))
+print(len(wetLand_area_25state.county.unique()))
+print(len(wetLand_area_25state.year.unique()))
+
+# %%
 need_cols = ["year", "county_fips", "wetLand_area", "wetLand_area_cv_(%)"]
 season_Feed_CRP = pd.merge(season_Feed, 
                            wetLand_area[need_cols].drop_duplicates(), 
@@ -213,6 +225,22 @@ print (f"{season_Feed_CRP.shape = }")
 print ("AgLand.data_item are {}".format(list(AgLand.data_item.unique())))
 print ()
 AgLand.head(2)
+
+# %%
+# wetLand_area_25state = wetLand_area[wetLand_area.state.isin(SoI)]
+print (AgLand.shape)
+print(len(AgLand.state.unique()))
+print(len(AgLand.county.unique()))
+print(len(AgLand.year.unique()))
+
+# %%
+AgLand_25state = AgLand[AgLand.state.isin(SoI)]
+print (AgLand_25state.shape)
+print(len(AgLand_25state.state.unique()))
+print(len(AgLand_25state.county.unique()))
+print(len(AgLand_25state.year.unique()))
+
+# %%
 
 # %% [markdown]
 # # TEST
@@ -290,6 +318,8 @@ AgLand.head(2)
 # WSDA_2018_areas_df
 
 # %%
+
+# %%
 # AgLand_WA = AgLand[AgLand.state == "Washington"].copy()
 # AgLand_WA.rename(columns={"value":"area"}, inplace=True)
 # AgLand_WA.area = AgLand_WA.area.replace(',','', regex=True)
@@ -313,8 +343,6 @@ AgLand.head(2)
 # AgLand_WA_FarmOper_acr_perCounty.head(2)
 
 # %%
-
-# %%
 # AgLand_WA_irr_acr_perCounty = AgLand_irrigated_WA[["county", "area", "year"]].groupby(
 #                                                      ["county", "year"]).sum().reset_index()
 # AgLand_WA_irr_acr_perCounty.rename(columns={"area":"irr_area"}, inplace=True)
@@ -336,9 +364,20 @@ AgLand.head(2)
 # Agland_areas_df2.head(10)
 
 # %%
+AgLand.rename(columns={"value":"area"}, inplace=True)
+
+AgLand = AgLand[AgLand.area != ' (D)'].copy()
+AgLand.area = AgLand.area.replace(',','', regex=True)
+AgLand.area = AgLand.area.astype(int)
+
+AgLand_FarmOper = AgLand[AgLand.data_item == "FARM OPERATIONS - ACRES OPERATED"].copy()
+AgLand_FarmOper.reset_index(drop=True, inplace=True)
+
 AgLand_irrigated = AgLand[AgLand.data_item == "AG LAND, IRRIGATED - ACRES"].copy()
 AgLand_irrigated.reset_index(drop=True, inplace=True)
 AgLand_irrigated.head(2)
+
+# %%
 
 # %%
 # if "value" in wetLand_area.columns:
@@ -352,27 +391,52 @@ AgLand_irrigated.head(2)
 # %%
 # I do not know why I have "irrigated.columns" below.
 # GitHub said wetLand. So, I fixed it above.
-
 if "value" in AgLand_irrigated.columns:
     AgLand_irrigated.rename(columns={"value":"irrigated_area", 
-                              "cv_(%)":"irrigated_area_cv_(%)"}, 
+                                     "cv_(%)":"irrigated_area_cv_(%)"}, 
                         inplace=True)
 
 print(f"{AgLand_irrigated.data_item.unique() = }")
 AgLand_irrigated.head(2)
 
 # %%
+AgLand_FarmOper_acr_perCounty = AgLand_FarmOper[["state", "county", "area", "year", "county_fips"]].groupby(
+                                                    ["state", "county", "year", "county_fips"]).sum().reset_index()
+AgLand_FarmOper_acr_perCounty.head(2)
+
+AgLand_irr_acr_perCounty = AgLand_irrigated[["state", "county", "area", "year", "county_fips"]].groupby(
+                                                     ["state", "county", "year", "county_fips"]).sum().reset_index()
+AgLand_irr_acr_perCounty.rename(columns={"area":"irr_area"}, inplace=True)
+
+
+# %%
+Agland_areas_df = pd.merge(AgLand_FarmOper_acr_perCounty, 
+                            AgLand_irr_acr_perCounty, 
+                            on=["state", "county", "year", "county_fips"], how='left')
+Agland_areas_df["irr_as_perc"] = (Agland_areas_df.irr_area / Agland_areas_df.area)*100
+Agland_areas_df.iloc[:, 1:] = Agland_areas_df.iloc[:, 1:].round(2)
+Agland_areas_df.head(5)
+
+# %%
+Agland_areas_df[Agland_areas_df.state=="Washington"].head(5)
+
+# %%
 season_Feed_CRP.head(2)
 
 # %%
-AgLand_irrigated.head(2)
+Agland_areas_df.head(2)
 
 # %%
-need_cols = ["year", "county_fips", "irrigated_area", "irrigated_area_cv_(%)"]
+season_Feed_CRP.head(2)
+
+# %%
+need_cols = ["state", "county", "year", "county_fips", "irr_as_perc"]
 season_Feed_CRP_irr = pd.merge(season_Feed_CRP, 
-                               AgLand_irrigated[need_cols].drop_duplicates(), 
-                               on=["year", "county_fips"], how='left')
+                               Agland_areas_df[need_cols].drop_duplicates(), 
+                               on=["year", "county_fips", "state", "county"], how='left')
 del(need_cols)
+
+season_Feed_CRP_irr.head(2)
 
 # %%
 
@@ -552,42 +616,68 @@ season_Feed_CRP_irr.head(2)
 pop_wide.head(2)
 
 # %%
-season_Feed_CRP_pop = pd.merge(season_Feed_CRP, pop_wide, 
-                               on=["year", "county_fips"], how='left')
-
-
-# %%
-print (f"{season_Feed_CRP.shape = }")
-print (f"{season_Feed_CRP_pop.shape = }")
-season_Feed_CRP_pop.head(5)
+# AgLand_25state = AgLand[AgLand.state.isin(SoI)]
+print (pop_wide.shape)
+print(len(pop_wide.county_fips.unique()))
+# print(len(pop_wide.county.unique()))
+# print(len(pop_wide.year.unique()))
 
 # %%
-# myAgland_WA = myAgland[myAgland.State == "ALABAMA"].copy()
-# myAgland_WA = myAgland_WA[myAgland_WA.County=="AUTAUGA"].copy()
-# myAgland_WA = myAgland_WA[~(myAgland_WA.Value == " (D)")].copy()
-# myAgland_WA.Value = myAgland_WA.Value.replace(',','', regex=True)
-# myAgland_WA.Value = myAgland_WA.Value.astype(int)
-# myAgland_WA[["Value", "County", "Year", "Data Item"]].groupby(["Data Item", "County", "Year"]).sum().reset_index()
-# myAgland_WA.head(2)
+print (season_Feed_CRP_irr.shape)
+print(len(season_Feed_CRP_irr.county_fips.unique()))
 
 # %%
+season_Feed_CRP_irr_pop = pd.merge(season_Feed_CRP_irr, pop_wide, 
+                                   on=["year", "county_fips"], how='left')
+
+season_Feed_CRP_irr_pop.head(2)
 
 # %%
-# AgLand_NASS = AgLand[AgLand.state=="Alabama"].copy()
-# AgLand_NASS = AgLand_NASS[AgLand_NASS.county == "Autauga"].copy()
-# AgLand_NASS.value = AgLand_NASS.value.replace(',','', regex=True)
-# AgLand_NASS.value = AgLand_NASS.value.astype(int)
+print (f"{season_Feed_CRP_irr.shape = }")
+print (f"{season_Feed_CRP_irr_pop.shape = }")
+season_Feed_CRP_irr_pop.head(5)
 
-# AgLand_NASS[["value", "county", "year"]].groupby(["county", "year"]).sum().reset_index()
-
-# %%
-
-# %%
-AgLand_WA = AgLand[AgLand.state == "Alabama"].copy()
-AgLand_WA = AgLand[AgLand.county == "Autauga"].copy()
-AgLand_WA.head(2)
+# %% [markdown]
+# ### Beef Cow Inventory (heads)
+#
+#  - Total Beef Cow inventory: https://quickstats.nass.usda.gov/#ADD6AB04-62EF-3DBF-9F83-5C23977C6DC7
+#  - Inventory of Beef Cows: https://quickstats.nass.usda.gov/#B2688D70-61AC-3E14-AA15-11882355E95E
 
 # %%
-AgLand_WA.year.unique()
+# totalBeefCowInv = pd.read_csv(USDA_data_dir + "totalBeefCowInv.csv")
+# totalBeefCowInv.head(2)
+
+# %%
+print (len(totalBeefCowInv.state.unique()))
+print (len(totalBeefCowInv.county.unique()))
+print (len(totalBeefCowInv.year.unique()))
+
+totalBeefCowInv.head(2)
+
+# %%
+totalBeefCowInv.rename(columns={"value":"total_beefCowInv", 
+                             "cv_(%)":"total_beefCowInv_(%)"}, inplace=True)
+totalBeefCowInv.head(2)
+
+# %%
+totalBeefCowInv = totalBeefCowInv[totalBeefCowInv.state.isin(SoI)].copy()
+
+print (totalBeefCowInv.shape)
+print(len(totalBeefCowInv.state.unique()))
+print(len(totalBeefCowInv.county.unique()))
+print(len(totalBeefCowInv.year.unique()))
+
+totalBeefCowInv.head(2)
+
+# %%
+need_cols = ["year", "county_fips", "total_beefCowInv", "total_beefCowInv_(%)"]
+season_Feed_CRP_irr_pop_beef = pd.merge(season_Feed_CRP_irr_pop, 
+                                        totalBeefCowInv[need_cols].drop_duplicates(), 
+                                        on=["year", "county_fips"], how='left')
+
+# %%
+season_Feed_CRP_irr_pop_beef.head(2)
+
+# %%
 
 # %%

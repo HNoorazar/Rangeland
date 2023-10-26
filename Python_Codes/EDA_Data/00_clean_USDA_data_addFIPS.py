@@ -31,6 +31,11 @@
 # - Irrigated acres and total land in farms by county, 1997-2017:
 #
 #    https://quickstats.nass.usda.gov/#B2688D70-61AC-3E14-AA15-11882355E95E
+#    
+# __________________________________________________________________
+#
+#  - Total Beef Cow inventory: https://quickstats.nass.usda.gov/#ADD6AB04-62EF-3DBF-9F83-5C23977C6DC7
+#  - Inventory of Beef Cows: https://quickstats.nass.usda.gov/#B2688D70-61AC-3E14-AA15-11882355E95E
 
 # %%
 import pandas as pd
@@ -54,6 +59,7 @@ AgLand = pd.read_csv(USDA_data_dir + "AgLand.csv")
 wetLand_area = pd.read_csv(USDA_data_dir + "wetLand_area.csv")
 FarmOperation = pd.read_csv(USDA_data_dir + "FarmOperation.csv")
 feed_expense = pd.read_csv(USDA_data_dir + "feed_expense.csv")
+totalBeefCowInv = pd.read_csv(USDA_data_dir + "totalBeefCowInv.csv")
 
 # %%
 feed_expense.head(2)
@@ -67,6 +73,8 @@ wetLand_area.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
 FarmOperation.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
 feed_expense.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
 
+totalBeefCowInv.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
+
 sorted(list(feed_expense.columns))
 
 # %%
@@ -74,33 +82,41 @@ print (f"{AgLand.shape = }")
 print (f"{wetLand_area.shape = }")
 print (f"{FarmOperation.shape = }")
 print (f"{feed_expense.shape = }")
+print (f"{totalBeefCowInv.shape = }")
 
 # %%
 print ((feed_expense.columns == AgLand.columns).all())
 print ((feed_expense.columns == wetLand_area.columns).all())
 print ((feed_expense.columns == FarmOperation.columns).all())
+print ((feed_expense.columns == totalBeefCowInv.columns).all())
+
+# %%
 
 # %%
 print (AgLand.zip_code.unique())
 print (wetLand_area.zip_code.unique())
 print (feed_expense.zip_code.unique())
 print (FarmOperation.zip_code.unique())
+print (totalBeefCowInv.zip_code.unique())
 print ()
 print (AgLand.week_ending.unique())
 print (wetLand_area.week_ending.unique())
 print (feed_expense.week_ending.unique())
 print (FarmOperation.week_ending.unique())
+print (totalBeefCowInv.week_ending.unique())
 
 # %%
 print (AgLand.watershed.unique())
 print (wetLand_area.watershed.unique())
 print (feed_expense.watershed.unique())
 print (FarmOperation.watershed.unique())
+print (totalBeefCowInv.watershed.unique())
 print ()
 print (AgLand.domain_category.unique())
 print (wetLand_area.domain_category.unique())
 print (feed_expense.domain_category.unique())
 print (FarmOperation.domain_category.unique())
+print (totalBeefCowInv.domain_category.unique())
 
 # %%
 FarmOperation.state_ansi.unique()
@@ -110,58 +126,62 @@ print (AgLand.domain.unique())
 print (wetLand_area.domain.unique())
 print (feed_expense.domain.unique())
 print (FarmOperation.domain.unique())
+print (totalBeefCowInv.domain.unique())
 print ()
 
 print (AgLand.watershed_code.unique())
 print (wetLand_area.watershed_code.unique())
 print (feed_expense.watershed_code.unique())
 print (FarmOperation.watershed_code.unique())
+print (totalBeefCowInv.watershed_code.unique())
 
 # %%
-print (AgLand.ag_district_code.unique())
-print (wetLand_area.ag_district_code.unique())
-print (feed_expense.ag_district_code.unique())
-print (FarmOperation.ag_district_code.unique())
+print (sorted(AgLand.ag_district_code.unique()))
+print (sorted(wetLand_area.ag_district_code.unique()))
+print (sorted(feed_expense.ag_district_code.unique()))
+print (sorted(FarmOperation.ag_district_code.unique()))
+print (sorted(totalBeefCowInv.ag_district_code.unique()))
 
 # %%
 print (AgLand.watershed.unique())
 print (wetLand_area.watershed.unique())
 print (feed_expense.watershed.unique())
 print (FarmOperation.watershed.unique())
+print (totalBeefCowInv.watershed.unique())
 
 # %%
 print (AgLand.region.unique())
 print (wetLand_area.region.unique())
 print (feed_expense.region.unique())
 print (FarmOperation.region.unique())
+print (totalBeefCowInv.region.unique())
 
 # %%
 print (AgLand.program.unique())
 print (wetLand_area.program.unique())
 print (feed_expense.program.unique())
 print (FarmOperation.program.unique())
+print (totalBeefCowInv.program.unique())
 
 # %%
 print (AgLand.period.unique())
 print (wetLand_area.period.unique())
 print (feed_expense.period.unique())
 print (FarmOperation.period.unique())
+print (totalBeefCowInv.period.unique())
 print ()
 print (AgLand.geo_level.unique())
 print (wetLand_area.geo_level.unique())
 print (feed_expense.geo_level.unique())
 print (FarmOperation.geo_level.unique())
+print (totalBeefCowInv.geo_level.unique())
 
 # %%
-print (AgLand.period.unique())
-print (wetLand_area.period.unique())
-print (feed_expense.period.unique())
-print (FarmOperation.period.unique())
-print ()
 print (AgLand.data_item.unique())
 print (wetLand_area.data_item.unique())
 print (feed_expense.data_item.unique())
 print (FarmOperation.data_item.unique())
+print (totalBeefCowInv.data_item.unique())
 
 # %%
 
@@ -244,8 +264,7 @@ AgLand.drop(bad_cols, axis="columns", inplace=True)
 wetLand_area.drop(bad_cols, axis="columns", inplace=True)
 feed_expense.drop(bad_cols, axis="columns", inplace=True)
 FarmOperation.drop(bad_cols, axis="columns", inplace=True)
-
-# %%
+totalBeefCowInv.drop(bad_cols, axis="columns", inplace=True)
 
 # %%
 AgLand.head(2)
@@ -336,6 +355,37 @@ feed_expense["county_fips"] = feed_expense["state_ansi"] + feed_expense["county_
 feed_expense[["state", "county", "state_ansi", "county_ansi", "county_fips"]].head(5)
 
 # %%
+totalBeefCowInv.head(2)
+
+# %%
+totalBeefCowInv['county_ansi'].fillna(666, inplace=True)
+
+totalBeefCowInv["state_ansi"] = totalBeefCowInv["state_ansi"].astype('int32')
+totalBeefCowInv["county_ansi"] = totalBeefCowInv["county_ansi"].astype('int32')
+
+totalBeefCowInv["state_ansi"] = totalBeefCowInv["state_ansi"].astype('str')
+totalBeefCowInv["county_ansi"] = totalBeefCowInv["county_ansi"].astype('str')
+
+totalBeefCowInv.state = totalBeefCowInv.state.str.title()
+totalBeefCowInv.county = totalBeefCowInv.county.str.title()
+
+for idx in totalBeefCowInv.index:
+    if len(totalBeefCowInv.loc[idx, "state_ansi"]) == 1:
+        totalBeefCowInv.loc[idx, "state_ansi"] = "0" + totalBeefCowInv.loc[idx, "state_ansi"]
+        
+    if len(totalBeefCowInv.loc[idx, "county_ansi"]) == 1:
+        totalBeefCowInv.loc[idx, "county_ansi"] = "00" + totalBeefCowInv.loc[idx, "county_ansi"]
+    elif len(totalBeefCowInv.loc[idx, "county_ansi"]) == 2:
+        totalBeefCowInv.loc[idx, "county_ansi"] = "0" + totalBeefCowInv.loc[idx, "county_ansi"]
+        
+        
+totalBeefCowInv["county_fips"] = totalBeefCowInv["state_ansi"] + totalBeefCowInv["county_ansi"]
+totalBeefCowInv[["state", "county", "state_ansi", "county_ansi", "county_fips"]].head(5)
+
+# %%
+totalBeefCowInv.head(2)
+
+# %%
 feed_expense[(feed_expense.state=="Alabama") & (feed_expense.county=="Washington")]
 
 # %%
@@ -356,8 +406,11 @@ from datetime import datetime
 
 filename = reOrganized_dir + "USDA_data.sav"
 
-export_ = {"AgLand": AgLand, "wetLand_area": wetLand_area, 
-           "feed_expense": feed_expense, "FarmOperation": FarmOperation, 
+export_ = {"AgLand": AgLand, 
+           "wetLand_area": wetLand_area, 
+           "feed_expense": feed_expense, 
+           "FarmOperation": FarmOperation,
+           "totalBeefCowInv":totalBeefCowInv,
            "source_code" : "00_clean_USDA_data_addFIPS",
            "Author": "HN",
            "Date" : datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
@@ -390,7 +443,60 @@ feed_expense.head(5)
 # %%
 
 # %%
+a_file = "NDVI_SG_DL_6_SR_8.csv"
+a_file_split = a_file.split("_")
 
 # %%
+a_file = "SVM_NDVI_SG_NoneWeight_00_Desk_AccScor_SR8_train_ID6.csv"
+a_file_split = a_file.split("_")
+a_file_split[-1][2]
+
+# %%
+
+# %%
+mid_dir = "/Users/hn/Documents/01_research_data/RangeLand/Data/Min_Data/"
+econregion_gridmet_mean_indices = pd.read_csv(mid_dir + "econregion_gridmet_mean_indices.csv")
+
+# %%
+econregion_gridmet_mean_indices.head(2)
+
+# %%
+econregion_gridmet_mean_indices.econregion.unique()
+
+# %%
+econregion_gridmet_mean_indices[econregion_gridmet_mean_indices.econregion==0]
+
+# %%
+econregion_gridmet_mean_indices.columns
+
+# %%
+corn_sileage = pd.read_csv("/Users/hn/Downloads/F3AC0395-E528-3A1A-B360-ED4DEA8F4331.csv")
+
+# %%
+corn_sileage.head(2)
+
+# %%
+corn_sileage.columns
+
+# %%
+corn_sileage["County ANSI"][1:5]
+
+# %%
+corn_sileage["State ANSI"][1:5]
+
+# %%
+corn_sileage["countyStateFips"] = corn_sileage["County ANSI"] + corn_sileage["State ANSI"]
+
+# %%
+corn_sileage.sort_values(by=["State", "County"], inplace=True)
+
+# %%
+corn_sileage["Data Item"].unique()
+
+# %%
+corn_sileage.Year.unique()
+
+# %%
+corn_sileage_total = pd.read_csv("/Users/hn/Downloads/EA414F97-0B18-3B1A-947C-A28175EBD6A0.csv")
 
 # %%
