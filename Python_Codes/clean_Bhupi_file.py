@@ -73,10 +73,6 @@ for ii in Bhupi_25Satates_SC_df.SC.unique():
         multiple_IDs = pd.concat([multiple_IDs, A])
 
 # %%
-
-# %%
-
-# %%
 print (sorted(list(multiple_IDs.state.unique())))
 print (multiple_IDs.shape)
 multiple_IDs

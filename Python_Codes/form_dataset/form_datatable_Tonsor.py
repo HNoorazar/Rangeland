@@ -92,19 +92,17 @@ cntyMean_seasonVars_wide = cntyMean_seasonVars_wide["wide_seasonal_vars_cntyMean
 
 cntyMean_seasonVars_wide.sort_values(by=['state', 'county', 'year'], inplace=True)
 cntyMean_seasonVars_wide.reset_index(drop=True, inplace=True)
+cntyMean_seasonVars_wide = cntyMean_seasonVars_wide.round(decimals=2)
+cntyMean_seasonVars_wide.head(2)
 
 # %%
 USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
-
+print (USDA_data.keys())
 feed_expense = USDA_data["feed_expense"]
 AgLand = USDA_data["AgLand"]
 wetLand_area = USDA_data["wetLand_area"]
-totalBeefCowInv = USDA_data["totalBeefCowInv"]
+cattle_inventory = USDA_data["cattle_inventory"]
 # FarmOperation = USDA_data["FarmOperation"] # not needed. create by NASS guy.
-
-# %%
-cntyMean_seasonVars_wide = cntyMean_seasonVars_wide.round(decimals=2)
-cntyMean_seasonVars_wide.head(2)
 
 # %%
 feed_expense[(feed_expense.state=="Alabama") & (feed_expense.county=="Baldwin")]
@@ -131,12 +129,283 @@ print(len(feed_expense.year.unique()))
 
 feed_expense.head(2)
 
+# %% [markdown]
+# ### List all counties and years we want so we can fill the damn gaps
+
+# %%
+season_counties = cntyMean_seasonVars_wide.county_fips.unique()
+print (f"{len(season_counties) = }")
+
 # %%
 ### Subset seasonal vars to every 5 years that is in the USDA NASS
 USDA_years = list(feed_expense.year.unique())
 seasonal_5yearLapse = cntyMean_seasonVars_wide[cntyMean_seasonVars_wide.year.isin(USDA_years)].copy()
 seasonal_5yearLapse.reset_index(drop=True, inplace=True)
 seasonal_5yearLapse.head(2)
+
+# %%
+USDA_years
+
+# %% [markdown]
+# ### Fill the gaps in feed expenses
+
+# %%
+missing_cnty_in_feed_expense = [x for x in season_counties if x not in feed_expense.county_fips.values]
+missing_cnty_in_AgLand = [x for x in season_counties if x not in AgLand.county_fips.values]
+missing_cnty_in_cattle = [x for x in season_counties if x not in cattle_inventory.county_fips.values]
+missing_cnty_in_wetLand = [x for x in season_counties if x not in wetLand_area.county_fips.values]
+
+# %%
+missing_cnty_in_feed_expense_set = set(missing_cnty_in_feed_expense)
+missing_cnty_in_AgLand_set = set(missing_cnty_in_AgLand)
+missing_cnty_in_cattle_set = set(missing_cnty_in_cattle)
+missing_cnty_in_wetLand_set = set(missing_cnty_in_wetLand)
+
+# %%
+print (f"{len(missing_cnty_in_feed_expense_set) = }")
+print (f"{len(missing_cnty_in_AgLand_set) = }")
+print (f"{len(missing_cnty_in_cattle_set) = }")
+print (f"{len(missing_cnty_in_wetLand_set) = }")
+
+USDA_missing_counties = missing_cnty_in_feed_expense_set.\
+           intersection(missing_cnty_in_AgLand_set).\
+           intersection(missing_cnty_in_cattle).\
+           intersection(missing_cnty_in_wetLand_set)
+
+print (len(USDA_missing_counties))
+
+# %% [markdown]
+# # Toss all the counties for which there is no data 
+
+# %%
+[x for x in missing_cnty_in_feed_expense_set if not (x in USDA_missing_counties)]
+
+# %%
+cntyMean_seasonVars_wide = cntyMean_seasonVars_wide[~cntyMean_seasonVars_wide.county_fips.
+                                                    isin(list(missing_cnty_in_wetLand_set))]
+
+seasonal_5yearLapse = seasonal_5yearLapse[~seasonal_5yearLapse.county_fips.
+                                                    isin(list(missing_cnty_in_wetLand_set))]
+
+season_counties = cntyMean_seasonVars_wide.county_fips.unique()
+print (f"{len(season_counties) = }")
+
+# %%
+wetLand_area.head(2)
+
+# %%
+[x for x in missing_cnty_in_wetLand_set if x not in missing_cnty_in_cattle_set]
+
+# %%
+
+# %%
+AgLand = AgLand[~AgLand.county_fips.isin(list(missing_cnty_in_cattle_set))]
+feed_expense = feed_expense[~feed_expense.county_fips.isin(list(missing_cnty_in_cattle_set))]
+wetLand_area = wetLand_area[~wetLand_area.county_fips.isin(list(missing_cnty_in_cattle_set))]
+cattle_inventory = cattle_inventory[~cattle_inventory.county_fips.isin(list(missing_cnty_in_cattle_set))]
+seasonal_5yearLapse = seasonal_5yearLapse[~seasonal_5yearLapse.county_fips.isin(list(missing_cnty_in_cattle_set))]
+
+# %%
+# check if there are missing values
+# for a_year in USDA_years:
+#     for season_counties
+
+
+# %%
+AgLand_cnty_w_missingYears = {}
+
+for a_cnty in AgLand.county_fips.unique():
+    A = AgLand[AgLand.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        AgLand_cnty_w_missingYears[a_cnty] = missin_yrs
+
+AgLand_cnty_w_missingYears
+
+# %%
+feed_expense_cnty_w_missingYears = {}
+
+for a_cnty in feed_expense.county_fips.unique():
+    A = feed_expense[feed_expense.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        feed_expense_cnty_w_missingYears[a_cnty] = missin_yrs
+
+feed_expense_cnty_w_missingYears
+
+# %%
+feed_expense_cnty_w_missingYears = {}
+
+for a_cnty in feed_expense.county_fips.unique():
+    A = feed_expense[feed_expense.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        feed_expense_cnty_w_missingYears[a_cnty] = missin_yrs
+
+feed_expense_cnty_w_missingYears
+
+# %%
+wetLand_area_cnty_w_missingYears = {}
+
+for a_cnty in wetLand_area.county_fips.unique():
+    A = wetLand_area[wetLand_area.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        wetLand_area_cnty_w_missingYears[a_cnty] = missin_yrs
+
+wetLand_area_cnty_w_missingYears
+
+# %%
+print (len(wetLand_area_cnty_w_missingYears))
+print (len(wetLand_area.county_fips.unique()))
+
+# %%
+cattle_inventory_cnty_w_missingYears = {}
+
+for a_cnty in cattle_inventory.county_fips.unique():
+    A = cattle_inventory[cattle_inventory.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        cattle_inventory_cnty_w_missingYears[a_cnty] = missin_yrs
+
+cattle_inventory_cnty_w_missingYears
+
+# %% [markdown]
+# # Do the analysis without wetland Area
+# since there are too many missing values.
+#
+# and ignore all the counties for which we do not have full cattle inventory data.
+
+# %%
+AgLand = AgLand[~AgLand.county_fips.isin(list(cattle_inventory_cnty_w_missingYears))]
+
+feed_expense = feed_expense[~feed_expense.county_fips.isin(list(cattle_inventory_cnty_w_missingYears))]
+
+wetLand_area = wetLand_area[~wetLand_area.county_fips.isin(list(cattle_inventory_cnty_w_missingYears))]
+
+cattle_inventory = cattle_inventory[~cattle_inventory.county_fips.isin(
+    list(cattle_inventory_cnty_w_missingYears))]
+
+seasonal_5yearLapse = seasonal_5yearLapse[~seasonal_5yearLapse.county_fips.isin(
+    list(cattle_inventory_cnty_w_missingYears))]
+
+# %%
+feed_expense_cnty_w_missingYears = {}
+
+for a_cnty in feed_expense.county_fips.unique():
+    A = feed_expense[feed_expense.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        feed_expense_cnty_w_missingYears[a_cnty] = missin_yrs
+
+feed_expense_cnty_w_missingYears
+
+# %%
+AgLand_cnty_w_missingYears = {}
+
+for a_cnty in AgLand.county_fips.unique():
+    A = AgLand[AgLand.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        AgLand_cnty_w_missingYears[a_cnty] = missin_yrs
+
+AgLand_cnty_w_missingYears
+
+# %%
+cattle_inventory_cnty_w_missingYears = {}
+
+for a_cnty in cattle_inventory.county_fips.unique():
+    A = cattle_inventory[cattle_inventory.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        cattle_inventory_cnty_w_missingYears[a_cnty] = missin_yrs
+
+cattle_inventory_cnty_w_missingYears
+
+# %%
+bad_cnties = ["34017", "36005"]
+
+# %%
+AgLand = AgLand[~AgLand.county_fips.isin(bad_cnties)]
+
+feed_expense = feed_expense[~feed_expense.county_fips.isin(bad_cnties)]
+
+wetLand_area = wetLand_area[~wetLand_area.county_fips.isin(bad_cnties)]
+
+cattle_inventory = cattle_inventory[~cattle_inventory.county_fips.isin(bad_cnties)]
+
+seasonal_5yearLapse = seasonal_5yearLapse[~seasonal_5yearLapse.county_fips.isin(bad_cnties)]
+
+# %%
+seasonal_5yearLapse_w_missingYears = {}
+
+for a_cnty in seasonal_5yearLapse.county_fips.unique():
+    A = seasonal_5yearLapse[seasonal_5yearLapse.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        seasonal_5yearLapse_w_missingYears[a_cnty] = missin_yrs
+
+seasonal_5yearLapse_w_missingYears
+
+# %%
+feed_expense_cnty_w_missingYears = {}
+
+for a_cnty in feed_expense.county_fips.unique():
+    A = feed_expense[feed_expense.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        feed_expense_cnty_w_missingYears[a_cnty] = missin_yrs
+
+feed_expense_cnty_w_missingYears
+
+# %%
+AgLand_cnty_w_missingYears = {}
+
+for a_cnty in AgLand.county_fips.unique():
+    A = AgLand[AgLand.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        AgLand_cnty_w_missingYears[a_cnty] = missin_yrs
+
+AgLand_cnty_w_missingYears
+
+# %%
+cattle_inventory_cnty_w_missingYears = {}
+
+for a_cnty in cattle_inventory.county_fips.unique():
+    A = cattle_inventory[cattle_inventory.county_fips == a_cnty]
+    aa = A.year.values
+    missin_yrs = [x for x in USDA_years if x not in aa]
+    if len(aa)<5:
+        cattle_inventory_cnty_w_missingYears[a_cnty] = missin_yrs
+
+cattle_inventory_cnty_w_missingYears
+
+# %%
+print (f"{len(cattle_inventory.county_fips.unique()) = }")
+print (f"{len(AgLand.county_fips.unique()) = }")
+print (f"{len(feed_expense.county_fips.unique()) = }")
+print (f"{len(seasonal_5yearLapse.county_fips.unique()) = }")
+
+# %%
+cattle_inventory.state.unique()
+
+# %% [markdown]
+# # All data at this point are there.
+# except we will not use wetland.And seasonal variables for some reason has more counties than others!
+
+# %%
 
 # %%
 #
@@ -165,7 +434,7 @@ print (f"{len(A) = }")
 A[:10]
 
 # %%
-feed_expense[feed_expense.county_fips=="06075"]
+season_Feed[season_Feed.county_fips=="27107"]
 
 # %%
 seasonal_5yearLapse[seasonal_5yearLapse.county_fips=="06075"]
