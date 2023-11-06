@@ -831,21 +831,11 @@ irr_areas_perc_df.head(2)
 
 # %%
 
-# %% [markdown]
-# # TEST
-#
-# Test and see what are the ```data_item```s here. Do they reflect percentages in WA counties?
-#
-# We need to add those in terms of percentage not absolute values.
-
 # %%
 season_Feed_CRP.head(2)
 
 # %%
 irr_areas_perc_df.head(2)
-
-# %%
-season_Feed_CRP.head(2)
 
 # %%
 need_cols = ["state", "county", "year", "county_fips", "irr_as_perc"]
@@ -858,8 +848,6 @@ season_Feed_CRP_irr = pd.merge(
 del need_cols
 
 season_Feed_CRP_irr.head(2)
-
-# %%
 
 # %% [markdown]
 # ### County Population
@@ -1022,20 +1010,12 @@ print("51515" in list(season_Feed_CRP_irr.county_fips))
 print("46102" in list(season_Feed_CRP_irr.county_fips))
 
 # %%
-A = [
-    x
-    for x in pop_2000_2010.county_fips
-    if not (x in list(season_Feed_CRP_irr.county_fips))
-]
-A
+A = [x for x in pop_2000_2010.county_fips if not (x in list(season_Feed_CRP_irr.county_fips))]
+print (len(A))
 
 # %%
-A = [
-    x
-    for x in pop_2010_2020.county_fips
-    if not (x in list(season_Feed_CRP_irr.county_fips))
-]
-A
+A = [x for x in pop_2010_2020.county_fips if not (x in list(season_Feed_CRP_irr.county_fips))]
+print (len(A))
 
 # %%
 L = len(pop_2000_2010) + len(pop_2010_2020)
@@ -1119,35 +1099,35 @@ season_Feed_CRP_irr_pop.head(5)
 # totalBeefCowInv = pd.read_csv(USDA_data_dir + "totalBeefCowInv.csv")
 # totalBeefCowInv.head(2)
 
-# %%
-print(len(totalBeefCowInv.state.unique()))
-print(len(totalBeefCowInv.county.unique()))
-print(len(totalBeefCowInv.year.unique()))
+# totalBeefCowInv.rename(
+#     columns={"value": "total_beefCowInv", "cv_(%)": "total_beefCowInv_(%)"},
+#     inplace=True,
+# )
+# totalBeefCowInv.head(2)
 
-totalBeefCowInv.head(2)
+# totalBeefCowInv = totalBeefCowInv[totalBeefCowInv.state.isin(SoI)].copy()
 
-# %%
-totalBeefCowInv.rename(
-    columns={"value": "total_beefCowInv", "cv_(%)": "total_beefCowInv_(%)"},
-    inplace=True,
-)
-totalBeefCowInv.head(2)
+# print(totalBeefCowInv.shape)
+# print(len(totalBeefCowInv.state.unique()))
+# print(len(totalBeefCowInv.county.unique()))
+# print(len(totalBeefCowInv.year.unique()))
 
-# %%
-totalBeefCowInv = totalBeefCowInv[totalBeefCowInv.state.isin(SoI)].copy()
-
-print(totalBeefCowInv.shape)
-print(len(totalBeefCowInv.state.unique()))
-print(len(totalBeefCowInv.county.unique()))
-print(len(totalBeefCowInv.year.unique()))
-
-totalBeefCowInv.head(2)
+# totalBeefCowInv.head(2)
 
 # %%
-need_cols = ["year", "county_fips", "total_beefCowInv", "total_beefCowInv_(%)"]
+print(len(cattle_inventory.state.unique()))
+print(len(cattle_inventory.county_fips.unique()))
+print(len(cattle_inventory.year.unique()))
+
+cattle_inventory.head(2)
+
+# %%
+
+# %%
+need_cols = ["year", "county_fips", "cattle_cow_inventory"]
 season_Feed_CRP_irr_pop_beef = pd.merge(
     season_Feed_CRP_irr_pop,
-    totalBeefCowInv[need_cols].drop_duplicates(),
+    cattle_inventory[need_cols].drop_duplicates(),
     on=["year", "county_fips"],
     how="left",
 )
