@@ -78,33 +78,6 @@ Bhupi["SC"] = Bhupi.state + "-" + Bhupi.county
 Bhupi.head(2)
 
 # %%
-SoI = [
-    "Alabama",
-    "Arkansas",
-    "California",
-    "Colorado",
-    "Florida",
-    "Georgia",
-    "Idaho",
-    "Illinois",
-    "Iowa",
-    "Kansas",
-    "Kentucky",
-    "Louisiana",
-    "Mississippi",
-    "Missouri",
-    "Montana",
-    "Nebraska",
-    "New Mexico",
-    "North Dakota",
-    "Oklahoma",
-    "Oregon",
-    "South Dakota",
-    "Tennessee",
-    "Texas",
-    "Virginia",
-    "Wyoming",
-]
 
 # %%
 # cntyMean_seasonVars_wide = pickle.load(open(seasonal_dir + "wide_seasonal_vars_cntyMean_wFips.sav", "rb"))
@@ -139,19 +112,23 @@ cattle_inventory = cattle_inventory[cattle_inventory.state.isin(SoI)].copy()
 # %%
 
 # %%
-feed_expense.rename(
-    columns={"value": "feed_expense", "cv_(%)": "feed_expense_cv_(%)"}, inplace=True
-)
+# feed_expense.rename(
+#     columns={"value": "feed_expense", "cv_(%)": "feed_expense_cv_(%)"}, inplace=True
+# )
 
-CRPwetLand_area.rename(
-    columns={"value": "CRP_wetLand_acr", "cv_(%)": "CRP_wetLand_acr_cv_(%)"},
-    inplace=True,
-)
+# CRPwetLand_area.rename(
+#     columns={"value": "CRP_wetLand_acr", "cv_(%)": "CRP_wetLand_acr_cv_(%)"},
+#     inplace=True,
+# )
 
-cattle_inventory.rename(
-    columns={"value": "cattle_cow_inventory", "cv_(%)": "cattle_cow_inventory_cv_(%)"},
-    inplace=True,
-)
+# cattle_inventory.rename(
+#     columns={"value": "cattle_cow_inventory", "cv_(%)": "cattle_cow_inventory_cv_(%)"},
+#     inplace=True,
+# )
+
+# %%
+print (len(AgLand.state.unique()))
+print (len(AgLand.county_fips.unique()))
 
 # %%
 CRPwetLand_area.head(2)
@@ -175,6 +152,10 @@ print()
 print(f"{cattle_inventory.shape = }")
 cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_inventory")
 print(f"{cattle_inventory.shape = }")
+
+# %%
+print (len(AgLand.state.unique()))
+print (len(AgLand.county_fips.unique()))
 
 # %% [markdown]
 # ### Compute irrigated percentages.

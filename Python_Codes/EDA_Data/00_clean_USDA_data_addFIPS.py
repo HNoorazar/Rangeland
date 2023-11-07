@@ -444,6 +444,25 @@ feed_expense[(feed_expense.state=="Alabama") & (feed_expense.county=="Washington
 # FarmOperation.drop(["county_ansi", "state_ansi", "ag_district_code"], axis="columns", inplace=True)
 
 # %%
+feed_expense.rename(
+    columns={"value": "feed_expense", "cv_(%)": "feed_expense_cv_(%)"}, inplace=True
+)
+
+wetLand_area.rename(
+    columns={"value": "CRP_wetLand_acr", "cv_(%)": "CRP_wetLand_acr_cv_(%)"},
+    inplace=True,
+)
+
+cattle_inventory.rename(
+    columns={"value": "cattle_cow_inventory", "cv_(%)": "cattle_cow_inventory_cv_(%)"},
+    inplace=True,
+)
+
+cattle_inventory.head(2)
+
+# %%
+
+# %%
 # AgLand.to_csv(reOrganized_dir + "USDA_AgLand_cleaned_01.csv", index=False)
 # wetLand_area.to_csv(reOrganized_dir  + "USDA_wetLand_area_cleaned_01.csv",  index=False)
 # feed_expense.to_csv(reOrganized_dir  + "USDA_feed_expense_cleaned_01.csv",  index=False)

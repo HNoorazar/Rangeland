@@ -27,7 +27,14 @@ os.makedirs(reOrganized_dir, exist_ok=True)
 
 # %%
 # county_rangeland_and_totalarea_fraction =pd.read_csv(f'/Users/hn/Documents/01_research_data/RangeLand/' + \
-#                                                       'Data/Min_Data/county_rangeland_and_totalarea_fraction.txt')
+#                                                      'Data/Min_Data/county_rangeland_and_totalarea_fraction.txt')
+
+# county_rangeland_and_totalarea_fraction.head(2)
+
+# print (county_rangeland_and_totalarea_fraction.shape)
+# county_rangeland_and_totalarea_fraction.drop_duplicates(inplace=True)
+# print (county_rangeland_and_totalarea_fraction.shape)
+# county_rangeland_and_totalarea_fraction.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
 # out_name = reOrganized_dir + "county_rangeland_and_totalarea_fraction.csv"
 # county_rangeland_and_totalarea_fraction.to_csv(out_name, index = False)
 
@@ -67,7 +74,7 @@ for a_file_name in county_annual_files:
     else:
         county_annual = pd.merge(county_annual, a_file, on=['year', 'county'], how='left')
 
-out_name = reOrganized_dir + "county_annual.csv"
+out_name = reOrganized_dir + "county_annual_GPP_NPP_productivity.csv"
 county_annual.to_csv(out_name, index = False)
 
 county_annual.head(2)
