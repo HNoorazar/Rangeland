@@ -42,7 +42,6 @@ os.makedirs(reOrganized_dir, exist_ok=True)
 # %%
 
 # %%
-import pandas as pd
 FarmOperation = pd.read_csv("/Users/hn/Documents/01_research_data/RangeLand/Data/NASS_downloads/FarmOperation.csv")
 
 
@@ -62,16 +61,12 @@ population_2000_file = "z_2000_2009_co-est2009-alldata.csv"
 population_2000 = pd.read_csv(census_dir + population_2000_file, encoding='latin-1')
 population_2000_2010 = pd.read_csv(census_dir + population_2000_2010_file, encoding='latin-1')
 population_2010_2020 = pd.read_csv(census_dir + population_2010_2020_file, encoding='latin-1')
-
-# %%
 population_2000.head(2)
 
 # %%
 population_2000.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
 population_2000_2010.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
 population_2010_2020.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
-
-# %%
 population_2000.head(2)
 
 # %%
@@ -83,9 +78,9 @@ population_2010_2020.rename({'state': 'state_fips', 'county':'county_fips'}, axi
 population_2000.rename({'stname': 'state', 'ctyname':'county'}, axis=1, inplace=True)
 population_2000_2010.rename({'stname': 'state', 'ctyname':'county'}, axis=1, inplace=True)
 population_2010_2020.rename({'stname': 'state', 'ctyname':'county'}, axis=1, inplace=True)
+population_2000_2010.head(2)
 
 # %%
-population_2000_2010.head(2)
 
 # %%
 # population_1990_1999 = pd.read_csv(f'/Users/hn/Documents/01_research_data/RangeLand/Data/' + \
@@ -95,12 +90,6 @@ population_1990_1999 = pd.read_csv(census_dir + population_1990_1999_file,
                                    header = 12, sep = "\t", on_bad_lines = 'skip',
                                    encoding = 'unicode_escape')
 population_1990_1999
-
-# %%
-population_1990_1999.head(10)
-
-# %%
-population_1990_1999.shape
 
 # %%
 cols = list(population_1990_1999.loc[0])[0].split(" ")

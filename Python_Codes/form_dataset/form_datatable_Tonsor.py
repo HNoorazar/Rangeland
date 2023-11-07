@@ -110,9 +110,7 @@ SoI = [
 # cntyMean_seasonVars_wide = pickle.load(open(seasonal_dir + "wide_seasonal_vars_cntyMean_wFips.sav", "rb"))
 
 # pandas >= 2.0.0
-cntyMean_seasonVars_wide = pd.read_pickle(
-    seasonal_dir + "wide_seasonal_vars_cntyMean_wFips.sav"
-)
+cntyMean_seasonVars_wide = pd.read_pickle(seasonal_dir + "wide_seasonal_vars_cntyMean_wFips.sav")
 cntyMean_seasonVars_wide = cntyMean_seasonVars_wide["wide_seasonal_vars_cntyMean_wFips"]
 
 cntyMean_seasonVars_wide.sort_values(by=["state", "county", "year"], inplace=True)
@@ -245,9 +243,7 @@ irr_areas_perc_df = pd.merge(
     on=["state", "county", "year", "county_fips"],
     how="left",
 )
-irr_areas_perc_df["irr_as_perc"] = (
-    irr_areas_perc_df.irrigated_area / irr_areas_perc_df.area
-) * 100
+irr_areas_perc_df["irr_as_perc"] = (irr_areas_perc_df.irrigated_area / irr_areas_perc_df.area) * 100
 irr_areas_perc_df.iloc[:, 1:] = irr_areas_perc_df.iloc[:, 1:].round(2)
 irr_areas_perc_df.head(5)
 
@@ -437,8 +433,6 @@ irr_areas_perc_df_noCRPwetLand = irr_areas_perc_df.copy()
 seasonal_5yearLapse_noCRPwetLand = seasonal_5yearLapse.copy()
 
 # %%
-
-# %%
 # irr_areas_perc_df
 
 # %%
@@ -456,15 +450,11 @@ toss_counties = (
 )
 
 # %%
-irr_areas_perc_df = irr_areas_perc_df[
-    ~irr_areas_perc_df.county_fips.isin(toss_counties)
-]
+irr_areas_perc_df = irr_areas_perc_df[~irr_areas_perc_df.county_fips.isin(toss_counties)]
 CRPwetLand_area = CRPwetLand_area[~CRPwetLand_area.county_fips.isin(toss_counties)]
 feed_expense = feed_expense[~feed_expense.county_fips.isin(toss_counties)]
 cattle_inventory = cattle_inventory[~cattle_inventory.county_fips.isin(toss_counties)]
-seasonal_5yearLapse = seasonal_5yearLapse[
-    ~seasonal_5yearLapse.county_fips.isin(toss_counties)
-]
+seasonal_5yearLapse = seasonal_5yearLapse[~seasonal_5yearLapse.county_fips.isin(toss_counties)]
 
 # %% [markdown]
 # ### now find all counties that they share.
@@ -481,15 +471,11 @@ common_counties = (
 len(common_counties)
 
 # %%
-irr_areas_perc_df = irr_areas_perc_df[
-    irr_areas_perc_df.county_fips.isin(common_counties)
-]
+irr_areas_perc_df = irr_areas_perc_df[irr_areas_perc_df.county_fips.isin(common_counties)]
 CRPwetLand_area = CRPwetLand_area[CRPwetLand_area.county_fips.isin(common_counties)]
 feed_expense = feed_expense[feed_expense.county_fips.isin(common_counties)]
 cattle_inventory = cattle_inventory[cattle_inventory.county_fips.isin(common_counties)]
-seasonal_5yearLapse = seasonal_5yearLapse[
-    seasonal_5yearLapse.county_fips.isin(common_counties)
-]
+seasonal_5yearLapse = seasonal_5yearLapse[seasonal_5yearLapse.county_fips.isin(common_counties)]
 
 # %%
 print(f"{len(irr_areas_perc_df.county_fips.unique()) = }")
@@ -583,22 +569,16 @@ A.sort_values("cattle_cow_inventory", inplace=True)
 A.head(2)
 
 # %%
-A[A.state.isin(A.state.unique()[:10])].groupby("state")["cattle_cow_inventory"].plot(
-    legend=True
-);
+A[A.state.isin(A.state.unique()[:10])].groupby("state")["cattle_cow_inventory"].plot(legend=True);
 
 # %%
-A[A.state.isin(A.state.unique()[10:20])].groupby("state")["cattle_cow_inventory"].plot(
-    legend=True
-);
+A[A.state.isin(A.state.unique()[10:20])].groupby("state")["cattle_cow_inventory"].plot(legend=True);
 
 # %%
 # fig, axs = plt.subplots(1, 1, figsize=(10, 3), sharex=False, # sharey='col', # sharex=True, sharey=True,
 #                    gridspec_kw={'hspace': 0.35, 'wspace': .05});
 
-A[A.state.isin(A.state.unique()[20:])].groupby("state")["cattle_cow_inventory"].plot(
-    legend=True
-);
+A[A.state.isin(A.state.unique()[20:])].groupby("state")["cattle_cow_inventory"].plot(legend=True);
 
 # %%
 A[A.state == "Texas"]
@@ -608,15 +588,13 @@ Beef_Cows_fromCATINV = pd.read_csv(reOrganized_dir + "Beef_Cows_fromCATINV.csv")
 Beef_Cows_fromCATINV.head(2)
 
 # %%
-abb_dict  = pd.read_pickle(param_dir + "state_abbreviations.sav")
+abb_dict = pd.read_pickle(param_dir + "state_abbreviations.sav")
 
 # %%
 state_25_abb = [abb_dict["full_2_abb"][x] for x in SoI]
 
 # %%
-Beef_Cows_fromCATINV = Beef_Cows_fromCATINV[
-    Beef_Cows_fromCATINV.state.isin(state_25_abb)
-]
+Beef_Cows_fromCATINV = Beef_Cows_fromCATINV[Beef_Cows_fromCATINV.state.isin(state_25_abb)]
 Beef_Cows_fromCATINV.reset_index(drop=True, inplace=True)
 Beef_Cows_fromCATINV.head(2)
 
@@ -643,9 +621,7 @@ axs[2].grid(axis="y", which="both")
 state_ = "TX"
 axs[0].plot(
     pd.to_datetime(shannon_years, format="%Y"),
-    Beef_Cows_fromCATINV.loc[
-        Beef_Cows_fromCATINV.state == state_, shannon_years
-    ].values[0],
+    Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
     c="dodgerblue",
     linewidth=2,
     label=state_ + " Shannon",
@@ -667,9 +643,7 @@ axs[0].legend(loc="best")
 state_ = "AL"
 axs[1].plot(
     pd.to_datetime(shannon_years, format="%Y"),
-    Beef_Cows_fromCATINV.loc[
-        Beef_Cows_fromCATINV.state == state_, shannon_years
-    ].values[0],
+    Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
     c="dodgerblue",
     linewidth=2,
     label=state_ + " Shannon",
@@ -691,9 +665,7 @@ axs[1].legend(loc="best")
 state_ = "OK"
 axs[2].plot(
     pd.to_datetime(shannon_years, format="%Y"),
-    Beef_Cows_fromCATINV.loc[
-        Beef_Cows_fromCATINV.state == state_, shannon_years
-    ].values[0],
+    Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
     c="dodgerblue",
     linewidth=2,
     label=state_ + " Shannon",
@@ -745,16 +717,10 @@ feed_expense_FIPS_yr = (
 )
 
 seasonal_5yearLapse_FIPS_yr = (
-    seasonal_5yearLapse["county_fips"].astype(str)
-    + "_"
-    + seasonal_5yearLapse["year"].astype(str)
+    seasonal_5yearLapse["county_fips"].astype(str) + "_" + seasonal_5yearLapse["year"].astype(str)
 )
 
-A = [
-    x
-    for x in list(seasonal_5yearLapse_FIPS_yr)
-    if not (x in list(feed_expense_FIPS_yr))
-]
+A = [x for x in list(seasonal_5yearLapse_FIPS_yr) if not (x in list(feed_expense_FIPS_yr))]
 print(f"{len(A) = }")
 A[:10]
 
@@ -830,8 +796,6 @@ print(f"{season_Feed_CRP.shape = }")
 irr_areas_perc_df.head(2)
 
 # %%
-
-# %%
 season_Feed_CRP.head(2)
 
 # %%
@@ -850,215 +814,32 @@ del need_cols
 season_Feed_CRP_irr.head(2)
 
 # %% [markdown]
-# ### County Population
+# ## County Population
 #
 # This is population of people. I do not know how this is relevant. Each farm would send beef outside of the county, no?
 
 # %%
-population_file_names = [
-    x for x in os.listdir(census_population_dir) if x.startswith("z")
-]
-population_file_names
+human_population = pd.read_pickle(reOrganized_dir + "human_population.sav")
+human_population.keys()
 
 # %%
-pop_2000_2010 = pd.read_csv(
-    census_population_dir + "z_2000_2010_co-est00int-tot.csv", encoding="unicode_escape"
-)
-pop_2010_2020 = pd.read_csv(
-    census_population_dir + "z_2010-2020-co-est2020.csv", encoding="unicode_escape"
-)
-
-
-pop_2000_2010.drop(
-    [
-        "SUMLEV",
-        "REGION",
-        "DIVISION",
-    ],
-    axis=1,
-    inplace=True,
-)
-pop_2000_2010.rename(
-    columns={
-        "STATE": "state_fip",
-        "COUNTY": "cnty_fip",
-        "STNAME": "state",
-        "CTYNAME": "county",
-    },
-    inplace=True,
-)
-
-pop_2010_2020.drop(
-    [
-        "SUMLEV",
-        "REGION",
-        "DIVISION",
-    ],
-    axis=1,
-    inplace=True,
-)
-pop_2010_2020.rename(
-    columns={
-        "STATE": "state_fip",
-        "COUNTY": "cnty_fip",
-        "STNAME": "state",
-        "CTYNAME": "county",
-    },
-    inplace=True,
-)
+pop_wide = human_population["human_population"]
+pop_wide.head(2)
 
 # %%
-pop_2000_2010.head(2)
+print (f"{pop_wide.year.unique()            = }")
+print (f"{season_Feed_CRP_irr.year.unique() = }")
 
 # %%
-pop_2010_2020.head(2)
-
-# %%
-pop_2000_2010.state_fip = pop_2000_2010.state_fip.astype(str)
-pop_2000_2010.cnty_fip = pop_2000_2010.cnty_fip.astype(str)
-
-for idx in pop_2000_2010.index:
-    if len(pop_2000_2010.loc[idx, "state_fip"]) == 1:
-        pop_2000_2010.loc[idx, "state_fip"] = "0" + pop_2000_2010.loc[idx, "state_fip"]
-
-    col = "cnty_fip"
-    if len(pop_2000_2010.loc[idx, col]) == 1:
-        pop_2000_2010.loc[idx, col] = "00" + pop_2000_2010.loc[idx, col]
-    elif len(pop_2000_2010.loc[idx, col]) == 2:
-        pop_2000_2010.loc[idx, col] = "0" + pop_2000_2010.loc[idx, col]
-
-pop_2000_2010.head(2)
-
-# %%
-pop_2010_2020.state_fip = pop_2010_2020.state_fip.astype(str)
-pop_2010_2020.cnty_fip = pop_2010_2020.cnty_fip.astype(str)
-
-for idx in pop_2010_2020.index:
-    if len(pop_2010_2020.loc[idx, "state_fip"]) == 1:
-        pop_2010_2020.loc[idx, "state_fip"] = "0" + pop_2010_2020.loc[idx, "state_fip"]
-
-    col = "cnty_fip"
-    if len(pop_2010_2020.loc[idx, col]) == 1:
-        pop_2010_2020.loc[idx, col] = "00" + pop_2010_2020.loc[idx, col]
-    elif len(pop_2010_2020.loc[idx, col]) == 2:
-        pop_2010_2020.loc[idx, col] = "0" + pop_2010_2020.loc[idx, col]
-
-pop_2010_2020.head(2)
-
-# %% [markdown]
-# ### ```cnty_fip == 000```
-#
-# presentes all state. i.e. sum of all counties. Drop them.
-
-# %%
-pop_2000_2010.drop(pop_2000_2010[pop_2000_2010.cnty_fip == "000"].index, inplace=True)
-pop_2010_2020.drop(pop_2010_2020[pop_2010_2020.cnty_fip == "000"].index, inplace=True)
-
-# %%
-pop_2000_2010["county_fips"] = pop_2000_2010["state_fip"] + pop_2000_2010["cnty_fip"]
-pop_2010_2020["county_fips"] = pop_2010_2020["state_fip"] + pop_2010_2020["cnty_fip"]
-
-pop_2000_2010.drop(["state_fip", "cnty_fip"], axis=1, inplace=True)
-pop_2010_2020.drop(["state_fip", "cnty_fip"], axis=1, inplace=True)
-
-pop_2000_2010.head(2)
-
-# %%
-pop_2010_2020.head(2)
-
-# %%
-season_Feed_CRP_irr.year.unique()
-
-# %%
-pop_2000_2010 = pop_2000_2010[pop_2000_2010.state.isin(SoI)]
-pop_2010_2020 = pop_2010_2020[pop_2010_2020.state.isin(SoI)]
-
-pop_2000_2010.reset_index(drop=True, inplace=True)
-pop_2010_2020.reset_index(drop=True, inplace=True)
-
-# %%
-
-# %%
-need_cols_2000_2010 = ["county_fips", "POPESTIMATE2002", "POPESTIMATE2007"]
-need_cols_2010_2020 = ["county_fips", "POPESTIMATE2012", "POPESTIMATE2017"]
-
-# %%
-pop_2000_2010 = pop_2000_2010[need_cols_2000_2010]
-pop_2010_2020 = pop_2010_2020[need_cols_2010_2020]
-
-# %%
-pop_2000_2010.head(2)
-
-# %%
-pop_2010_2020.head(2)
-
-# %%
-print(f"{len(pop_2000_2010) = }")
-print(f"{len(pop_2010_2020) = }")
-
-# %%
-A = [x for x in pop_2010_2020.county_fips if not (x in list(pop_2000_2010.county_fips))]
-A
-
-# %%
-A = [x for x in pop_2000_2010.county_fips if not (x in list(pop_2010_2020.county_fips))]
-A
-
-# %%
+print("46113" in list(pop_wide.county_fips))
+print("51515" in list(pop_wide.county_fips))
+print("46102" in list(pop_wide.county_fips))
+print ()
 print("46113" in list(season_Feed_CRP_irr.county_fips))
 print("51515" in list(season_Feed_CRP_irr.county_fips))
 print("46102" in list(season_Feed_CRP_irr.county_fips))
 
 # %%
-A = [x for x in pop_2000_2010.county_fips if not (x in list(season_Feed_CRP_irr.county_fips))]
-print (len(A))
-
-# %%
-A = [x for x in pop_2010_2020.county_fips if not (x in list(season_Feed_CRP_irr.county_fips))]
-print (len(A))
-
-# %%
-L = len(pop_2000_2010) + len(pop_2010_2020)
-pop_wide = pd.DataFrame(
-    columns=["county_fips", "year", "population"], index=range(L * 2)
-)
-
-pop_wide.county_fips = "666"
-pop_wide.year = 666
-pop_wide.population = 666
-
-years_2000_2010 = [2002, 2007] * len(pop_2000_2010)
-years_2010_2020 = [2012, 2017] * len(pop_2010_2020)
-pop_wide.year = years_2000_2010 + years_2010_2020
-
-pop_wide.head(5)
-
-# %%
-wide_pointer = 0
-
-for idx in pop_2000_2010.index:
-    pop_wide.loc[wide_pointer, "county_fips"] = pop_2000_2010.loc[idx, "county_fips"]
-    pop_wide.loc[wide_pointer, "population"] = pop_2000_2010.loc[idx, "POPESTIMATE2002"]
-
-    pop_wide.loc[wide_pointer + 1, "county_fips"] = pop_2000_2010.loc[
-        idx, "county_fips"
-    ]
-    pop_wide.loc[wide_pointer + 1, "population"] = pop_2000_2010.loc[
-        idx, "POPESTIMATE2007"
-    ]
-    wide_pointer += 2
-
-for idx in pop_2010_2020.index:
-    pop_wide.loc[wide_pointer, "county_fips"] = pop_2010_2020.loc[idx, "county_fips"]
-    pop_wide.loc[wide_pointer, "population"] = pop_2010_2020.loc[idx, "POPESTIMATE2012"]
-
-    pop_wide.loc[wide_pointer + 1, "county_fips"] = pop_2010_2020.loc[
-        idx, "county_fips"
-    ]
-    pop_wide.loc[wide_pointer + 1, "population"] = pop_2010_2020.loc[
-        idx, "POPESTIMATE2017"
-    ]
-    wide_pointer += 2
 
 # %%
 season_Feed_CRP_irr.head(2)
@@ -1066,12 +847,32 @@ season_Feed_CRP_irr.head(2)
 # %%
 pop_wide.head(2)
 
+# %% [markdown]
+# # 1990-1999
+# Population file did not have state name in it. So, it is not filtered by *SoI*. So, number of FIPs is high.
+
 # %%
 # AgLand_25state = AgLand[AgLand.state.isin(SoI)]
 print(pop_wide.shape)
 print(len(pop_wide.county_fips.unique()))
 # print(len(pop_wide.county.unique()))
 # print(len(pop_wide.year.unique()))
+
+# %%
+county_fips_digit_count = 5
+short_fips = []
+long_fips = []
+for a_fip in pop_wide.county_fips.unique():
+    if len(a_fip) < county_fips_digit_count:
+        short_fips += [a_fip]
+        
+    if len(a_fip) > county_fips_digit_count:
+        long_fips += [a_fip]
+        
+print (short_fips)
+print (long_fips)
+
+# %%
 
 # %%
 print(season_Feed_CRP_irr.shape)
