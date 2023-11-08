@@ -461,6 +461,32 @@ cattle_inventory.rename(
 cattle_inventory.head(2)
 
 # %%
+feed_expense.head(2)
+
+# %%
+wetLand_area.head(2)
+
+# %%
+import sys
+sys.path.append("/Users/hn/Documents/00_GitHub/Rangeland/Python_Codes/")
+import rangeland_core as rc
+
+# %%
+print (wetLand_area.shape)
+wetLand_area = rc.clean_census(df=wetLand_area, col_="CRP_wetLand_acr")
+print (wetLand_area.shape)
+
+# %%
+print (cattle_inventory.shape)
+cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_inventory")
+print (cattle_inventory.shape)
+
+# %%
+print (feed_expense.shape)
+feed_expense = rc.clean_census(df=feed_expense, col_="feed_expense")
+print (feed_expense.shape)
+
+# %%
 
 # %%
 # AgLand.to_csv(reOrganized_dir + "USDA_AgLand_cleaned_01.csv", index=False)
@@ -536,3 +562,7 @@ econregion_gridmet_mean_indices[econregion_gridmet_mean_indices.econregion==0]
 
 # %%
 econregion_gridmet_mean_indices.columns
+
+# %%
+
+# %%
