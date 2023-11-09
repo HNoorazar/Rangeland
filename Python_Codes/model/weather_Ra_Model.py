@@ -100,8 +100,6 @@ seasonal_weather.keys()
 
 # %%
 seasonal_weather = seasonal_weather["seasonal"]
-
-# %%
 seasonal_weather.head(2)
 
 # %%
@@ -111,7 +109,6 @@ census_years
 needed_cols = seasonal_weather.columns[2:10]
 for a_col in needed_cols:
     seasonal_weather[a_col] = seasonal_weather[a_col].astype(float)
-    
 
 # %%
 
@@ -269,7 +266,8 @@ county_annual_SW_Ra_cattleInv.sort_values(by=["year", "county_fips"], inplace=Tr
 county_annual_SW_Ra_cattleInv.reset_index(drop=True, inplace=True)
 county_annual_SW_Ra_cattleInv.head(2)
 
-# %%
+# %% [markdown]
+# ## Least Squares based on 2017 ```weather```
 
 # %%
 SW_Ra_cattleInv_2017 = county_annual_SW_Ra_cattleInv[
@@ -302,10 +300,12 @@ county_annual_SW_Ra_cattleInv[county_annual_SW_Ra_cattleInv.year==2017].head(2)
 solution_2017
 
 # %%
-y_hat_2017 = expl_var_interc_2017 @ solution_2017
-res = y_2017 - y_hat_2017
-RSS = np.dot(res, res)
-RSS
+# y_hat_2017 = expl_var_interc_2017 @ solution_2017
+# res = y_2017 - y_hat_2017
+# RSS = np.dot(res, res)
+# RSS
+
+RSS_2017
 
 # %%
 
@@ -320,8 +320,6 @@ y_2012 = SW_Ra_cattleInv_2012[["cattle_cow_inventory"]].values.reshape(-1)
 
 expl_var_2012 = SW_Ra_cattleInv_2012[needed_cols].values
 expl_var_interc_2012 = np.hstack([expl_var_2012, np.ones(len(expl_var_2012)).reshape(-1, 1)])
-
-# %%
 expl_var_interc_2012
 
 # %%
