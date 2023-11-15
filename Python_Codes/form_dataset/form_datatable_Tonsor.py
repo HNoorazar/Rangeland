@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.5
+#       jupytext_version: 1.15.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -44,7 +44,7 @@ census_population_dir = data_dir_base + "census/"
 param_dir = data_dir_base + "parameters/"
 # Min_data_dir_base = data_dir_base + "Min_Data/"
 reOrganized_dir = data_dir_base + "reOrganized/"
-seasonal_dir = reOrganized_dir + "seasonal_variables/02_merged_mean_over_county/"
+seasonal_dir = reOrganized_dir + "My_seasonal_variables_Trash/02_merged_mean_over_county/"
 
 # %%
 # file_name = "countyMean_seasonalVars_wFips.csv"
@@ -95,13 +95,22 @@ cntyMean_seasonVars_wide.head(2)
 len(cntyMean_seasonVars_wide.county_fips.unique())
 
 # %%
-USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
+USDA_data = pd.read_pickle(reOrganized_dir + "USDA_data.sav")
 print(USDA_data.keys())
 AgLand = USDA_data["AgLand"]
 feed_expense = USDA_data["feed_expense"]
 CRPwetLand_area = USDA_data["wetLand_area"]
 cattle_inventory = USDA_data["cattle_inventory"]
 # FarmOperation = USDA_data["FarmOperation"] # not needed. create by NASS guy.
+
+# %%
+SoI = ["Alabama", "Arkansas", "California", 
+       "Colorado", "Florida", "Georgia", "Idaho",
+       "Illinois", "Iowa", "Kansas", "Kentucky",
+       "Louisiana", "Mississippi", "Missouri", "Montana", 
+       "Nebraska", "New Mexico", "North Dakota", 
+       "Oklahoma", "Oregon", "South Dakota", "Tennessee",
+       "Texas", "Virginia", "Wyoming"]
 
 # %%
 AgLand = AgLand[AgLand.state.isin(SoI)].copy()
@@ -570,8 +579,6 @@ Beef_Cows_fromCATINV.head(2)
 
 # %%
 abb_dict = pd.read_pickle(param_dir + "state_abbreviations.sav")
-
-# %%
 state_25_abb = [abb_dict["full_2_abb"][x] for x in SoI]
 
 # %%

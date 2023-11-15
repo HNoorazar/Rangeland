@@ -12,8 +12,10 @@ def clean_census(df, col_):
         - Column can have ' (D)' or ' (Z)' in it.
         - Numbers are as strings.
     """
+    df.reset_index(drop=True, inplace=True)
     df = df[df[col_] != " (D)"]
     df = df[df[col_] != " (Z)"]
+    df.reset_index(drop=True, inplace=True)
     if type(df[col_][0]) == str:
         df[col_] = df[col_].str.replace(",", "")
         df[col_] = df[col_].astype(float)

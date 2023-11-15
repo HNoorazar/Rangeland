@@ -67,7 +67,7 @@ Beef_Cows_CATINV = curr_sheet.copy()
 Beef_Cows_CATINV.tail(4)
 
 # %%
-out_name = reOrganized_dir + "Beef_Cows_fromCATINV.csv"
+out_name = reOrganized_dir + "Shannon_Beef_Cows_fromCATINV.csv"
 Beef_Cows_CATINV.to_csv(out_name, index = False)
 
 # %% [markdown]
