@@ -69,7 +69,7 @@ for x in SoI:
     SoI_abb = SoI_abb + [abb_dict["full_2_abb"][x]]
 
 # %%
-USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
+USDA_data = pd.read_pickle(reOrganized_dir + "USDA_data.sav")
 
 cattle_inventory = USDA_data["cattle_inventory"]
 
@@ -650,14 +650,10 @@ plt.rcParams.update(params)
 
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
-
-axes.scatter(cnty_ann_SW_NPP_Ra.modis_npp, 
-             cnty_ann_SW_NPP_Ra.cattle_cow_inventory,
-             s = 5)
-
+axes.grid(axis="y", which="both")
+axes.scatter(cnty_ann_SW_NPP_Ra.modis_npp, cnty_ann_SW_NPP_Ra.cattle_cow_inventory,s = 5)
 axes.set_xlabel("NPP");
 axes.set_ylabel("cow inventory");
-
 plt.show()
 
 # %%
@@ -678,14 +674,10 @@ sorted(cnty_ann_SW_NPP_Ra.modis_npp)[-10:]
 
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
-
-axes.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre,
-             cnty_ann_SW_NPP_Ra.modis_npp, 
-             s = 5)
-
+axes.grid(axis="y", which="both")
+axes.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre, cnty_ann_SW_NPP_Ra.modis_npp, s = 5)
 axes.set_xlabel("rangeland_acre");
 axes.set_ylabel("modis_npp");
-
 plt.show()
 
 # %%
@@ -700,14 +692,10 @@ NPP_RA.head(2)
 
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
-
-axes.scatter(NPP_RA.rangeland_acre, 
-             NPP_RA.NPP,
-             s = 5)
-
+axes.grid(axis="y", which="both")
+axes.scatter(NPP_RA.rangeland_acre, NPP_RA.NPP, s = 5)
 axes.set_xlabel("Acres");
 axes.set_ylabel("NPP");
-
 plt.show()
 
 # %%
@@ -715,7 +703,7 @@ cnty_ann_SW_NPP_Ra.head(2)
 
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
-
+axes.grid(axis="y", which="both")
 axes.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre,
              cnty_ann_SW_NPP_Ra.cattle_cow_inventory, 
              s = 5)
@@ -729,55 +717,35 @@ plt.show()
 # # Residial Plots
 
 # %%
-# %who
 
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
-ax1.grid(True); ax2.grid(True)
-
+ax1.grid(axis="y", which="both")
+ax2.grid(axis="y", which="both")
 ##################################################
-
-
-ax1.scatter(y_2012,
-            NPP_res2012_Model2017, 
-            s = 5)
-
+ax1.scatter(y_2012, NPP_res2012_Model2017, s = 5)
 ax1.set_xlabel("y_2012");
 ax1.set_ylabel("NPP_res2012_Model2017");
 ##################################################
-
-ax2.scatter(y_2012,
-            SW_res2012_Model2017, 
-             s = 5)
-
+ax2.scatter(y_2012, SW_res2012_Model2017, s = 5)
 ax2.set_xlabel("y_2012");
 ax2.set_ylabel("SW_res2012_Model2017");
-
 plt.show()
 
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
-ax1.grid(True); ax2.grid(True)
-
+ax1.grid(axis="y", which="both")
+ax2.grid(axis="y", which="both")
 ##################################################
-
-ax1.scatter(NPP_yhat2012_Model2017,
-            NPP_res2012_Model2017, 
-             s = 5)
-
+ax1.scatter(NPP_yhat2012_Model2017, NPP_res2012_Model2017, s = 5)
 ax1.set_xlabel("NPP_yhat2012_Model2017");
 ax1.set_ylabel("NPP_res2012_Model2017");
 ##################################################
-
-ax2.scatter(SW_yhat2012_Model2017,
-            SW_res2012_Model2017, 
-             s = 5)
-
+ax2.scatter(SW_yhat2012_Model2017, SW_res2012_Model2017, s = 5)
 ax2.set_xlabel("SW_yhat2012_Model2017");
 ax2.set_ylabel("SW_res2012_Model2017");
-
 plt.show()
 
 # %%
@@ -785,22 +753,14 @@ plt.show()
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
-ax1.grid(True); ax2.grid(True)
-
+ax1.grid(axis="y", which="both")
+ax2.grid(axis="y", which="both")
 ##################################################
-
-ax1.scatter(SW_Ra_cattleInv_2012.rangeland_acre,
-            NPP_res2012_Model2017, 
-             s = 5)
-
+ax1.scatter(SW_Ra_cattleInv_2012.rangeland_acre, NPP_res2012_Model2017, s = 5)
 ax1.set_xlabel("acre");
 ax1.set_ylabel("NPP_res2012_Model2017");
 ##################################################
-
-ax2.scatter(NPP_Ra_cattleInv_2012.rangeland_acre,
-            SW_res2012_Model2017, 
-             s = 5)
-
+ax2.scatter(NPP_Ra_cattleInv_2012.rangeland_acre, SW_res2012_Model2017, s = 5)
 ax2.set_xlabel("acre");
 ax2.set_ylabel("SW_res2012_Model2017");
 
@@ -812,26 +772,20 @@ NPP_A_2017
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
-ax1.grid(True); ax2.grid(True)
-
+ax1.grid(axis="y", which="both")
+ax2.grid(axis="y", which="both")
 ##################################################
-
-ax1.scatter(SW_Ra_cattleInv_2012.rangeland_acre,
-            NPP_res2012_Model2017, 
-             s = 5)
-
+ax1.scatter(SW_Ra_cattleInv_2012.rangeland_acre, NPP_res2012_Model2017, s = 5)
 ax1.set_xlabel("acre");
 ax1.set_ylabel("NPP_res2012_Model2017");
 ##################################################
-
-ax2.scatter(NPP_Ra_cattleInv_2012.rangeland_acre,
-            SW_res2012_Model2017, 
-             s = 5)
-
+ax2.scatter(NPP_Ra_cattleInv_2012.rangeland_acre, SW_res2012_Model2017, s = 5)
 ax2.set_xlabel("acre");
 ax2.set_ylabel("SW_res2012_Model2017");
 
 plt.show()
+
+# %%
 
 # %%
 

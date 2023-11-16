@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -249,8 +249,6 @@ irr_areas_perc_df[irr_areas_perc_df.county_fips == "32021"]
 print(irr_areas_perc_df.shape)
 irr_areas_perc_df.dropna(subset=["irr_as_perc"], inplace=True)
 print(irr_areas_perc_df.shape)
-
-# %%
 
 # %%
 cattle_inventory.head(2)
@@ -543,12 +541,8 @@ print(f"{min_yrs_needed = }")
 cattle_inventory_noCRPwetLand.head(2)
 
 # %%
-A = (
-    cattle_inventory_noCRPwetLand[["state", "year", "cattle_cow_inventory"]]
-    .groupby(["year", "state"])
-    .sum()
-    .reset_index()
-)
+A = cattle_inventory_noCRPwetLand[["state", "year", "cattle_cow_inventory"]]
+    .groupby(["year", "state"]).sum().reset_index()
 
 A.year = pd.to_datetime(A.year, format="%Y")
 A.head(2)
@@ -565,9 +559,8 @@ A[A.state.isin(A.state.unique()[:10])].groupby("state")["cattle_cow_inventory"].
 A[A.state.isin(A.state.unique()[10:20])].groupby("state")["cattle_cow_inventory"].plot(legend=True);
 
 # %%
-# fig, axs = plt.subplots(1, 1, figsize=(10, 3), sharex=False, # sharey='col', # sharex=True, sharey=True,
-#                    gridspec_kw={'hspace': 0.35, 'wspace': .05});
-
+# sharey='col', # sharex=True, sharey=True,
+# fig, axs = plt.subplots(1, 1, figsize=(10, 3), sharex=False, gridspec_kw={'hspace': 0.35, 'wspace': .05});
 A[A.state.isin(A.state.unique()[20:])].groupby("state")["cattle_cow_inventory"].plot(legend=True);
 
 # %%
@@ -593,11 +586,7 @@ Beef_Cows_fromCATINV = Beef_Cows_fromCATINV[cols]
 Beef_Cows_fromCATINV.head(2)
 
 # %%
-fig, axs = plt.subplots(
-    3,
-    1,
-    figsize=(12, 6),
-    sharex=False,  # sharey='col', # sharex=True, sharey=True,
+fig, axs = plt.subplots(3, 1, figsize=(12, 6), sharex=False, # sharey='col', # sharex=True, sharey=True,
     gridspec_kw={"hspace": 0.35, "wspace": 0.05},
 )
 axs[0].grid(axis="y", which="both")
@@ -607,70 +596,41 @@ axs[2].grid(axis="y", which="both")
 ##########################################################################################
 
 state_ = "TX"
-axs[0].plot(
-    pd.to_datetime(shannon_years, format="%Y"),
-    Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
-    c="dodgerblue",
-    linewidth=2,
-    label=state_ + " Shannon",
-)
+axs[0].plot(pd.to_datetime(shannon_years, format="%Y"),
+        Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
+        c="dodgerblue", linewidth=2, label=state_ + " Shannon")
 
 state_ = "Texas"
 B = A[A.state == state_].copy()
 B.sort_index(inplace=True)
-axs[0].plot(
-    B.index,
-    B[B.state == state_].cattle_cow_inventory.values,
-    c="red",
-    linewidth=2,
-    label=state_,
-)
-
+axs[0].plot(B.index, B.cattle_cow_inventory.values, c="red", linewidth=2, label=state_)
 axs[0].legend(loc="best")
 ##########################################################################################
 state_ = "AL"
-axs[1].plot(
-    pd.to_datetime(shannon_years, format="%Y"),
-    Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
-    c="dodgerblue",
-    linewidth=2,
-    label=state_ + " Shannon",
-)
+axs[1].plot(pd.to_datetime(shannon_years, format="%Y"),
+            Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
+            c="dodgerblue", linewidth=2, label=state_ + " Shannon")
 
 state_ = "Alabama"
 B = A[A.state == state_].copy()
 B.sort_index(inplace=True)
-axs[1].plot(
-    B.index,
-    B[B.state == state_].cattle_cow_inventory.values,
-    c="red",
-    linewidth=2,
-    label=state_,
-)
-
+axs[1].plot(B.index, B.cattle_cow_inventory.values, c="red", linewidth=2, label=state_)
 axs[1].legend(loc="best")
 ##########################################################################################
 state_ = "OK"
-axs[2].plot(
-    pd.to_datetime(shannon_years, format="%Y"),
-    Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
-    c="dodgerblue",
-    linewidth=2,
-    label=state_ + " Shannon",
-)
+axs[2].plot(pd.to_datetime(shannon_years, format="%Y"),
+            Beef_Cows_fromCATINV.loc[Beef_Cows_fromCATINV.state == state_, shannon_years].values[0],
+            c="dodgerblue", linewidth=2, label=state_ + " Shannon")
 
 state_ = "Oklahoma"
 B = A[A.state == state_].copy()
 B.sort_index(inplace=True)
-axs[2].plot(
-    B.index,
-    B[B.state == state_].cattle_cow_inventory.values,
-    c="red",
-    linewidth=2,
-    label=state_,
-)
+axs[2].plot(B.index, B.cattle_cow_inventory.values, c="red", linewidth=2, label=state_)
 
 axs[2].legend(loc="best");
+
+# %%
+B
 
 # %% [markdown]
 # ## Merge different variables
@@ -837,7 +797,7 @@ pop_wide.head(2)
 
 # %% [markdown]
 # # 1990-1999
-# Population file did not have state name in it. So, it is not filtered by *SoI*. So, number of FIPs is high.
+# Population file did not have state name in it. So, it is not filtered by **SoI**. So, number of FIPs is high.
 
 # %%
 # AgLand_25state = AgLand[AgLand.state.isin(SoI)]
@@ -867,10 +827,7 @@ print(season_Feed_CRP_irr.shape)
 print(len(season_Feed_CRP_irr.county_fips.unique()))
 
 # %%
-season_Feed_CRP_irr_pop = pd.merge(
-    season_Feed_CRP_irr, pop_wide, on=["year", "county_fips"], how="left"
-)
-
+season_Feed_CRP_irr_pop = pd.merge(season_Feed_CRP_irr, pop_wide, on=["year", "county_fips"], how="left")
 season_Feed_CRP_irr_pop.head(2)
 
 # %%
@@ -914,12 +871,10 @@ cattle_inventory.head(2)
 
 # %%
 need_cols = ["year", "county_fips", "cattle_cow_inventory"]
-season_Feed_CRP_irr_pop_beef = pd.merge(
-    season_Feed_CRP_irr_pop,
-    cattle_inventory[need_cols].drop_duplicates(),
-    on=["year", "county_fips"],
-    how="left",
-)
+season_Feed_CRP_irr_pop_beef = pd.merge(season_Feed_CRP_irr_pop,
+                                        cattle_inventory[need_cols].drop_duplicates(),
+                                        on=["year", "county_fips"],
+                                        how="left")
 
 # %%
 season_Feed_CRP_irr_pop_beef.head(2)
