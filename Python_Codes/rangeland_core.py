@@ -6,6 +6,12 @@ from pprint import pprint
 import os, os.path, sys
 
 
+def covert_unitNPP_2_toal(NPP_df, npp_col_, area_col_, new_col_):
+    meterSq_2_acr = 0.000247105
+    NPP_df[new_col_] = (NPP_df[npp_col_] * NPP_df[area_col_]) / meterSq_2_acr
+    return NPP_df
+
+
 def census_stateCntyAnsi_2_countyFips(df):
     df["state_ansi"] = df["state_ansi"].astype("int32")
     df["county_ansi"] = df["county_ansi"].astype("int32")

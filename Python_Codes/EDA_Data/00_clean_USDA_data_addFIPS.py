@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -60,13 +60,17 @@ wetLand_area = pd.read_csv(USDA_data_dir + "wetLand_area.csv")
 FarmOperation = pd.read_csv(USDA_data_dir + "FarmOperation.csv")
 feed_expense = pd.read_csv(USDA_data_dir + "feed_expense.csv")
 # totalBeefCowInv = pd.read_csv(USDA_data_dir + "totalBeefCowInv.csv")
-cattle_inventory = pd.read_csv(USDA_data_dir + "cattle_inventory.csv")
-cattle_inventory.head(2)
 
-# %%
+## This is the bad cattle inventory. Where they suggested on Nov. 13 meeting that
+## this might include dairy. At this point (Nov. 16), I am waiting for their response
+## on the new queries I fetched. I am going w/ Q4; look at myBeef_vs_Shannon.ipynb
+
 # totalBeefCowInv = pd.read_csv(USDA_data_dir + "totalBeefCowInv.csv")
-cattle_inventory = pd.read_csv(USDA_data_dir + "cattle_inventory.csv")
+# cattle_inventory = pd.read_csv(USDA_data_dir + "cattle_inventory.csv")
 
+# Q4:
+cattle_inventory = pd.read_csv(USDA_data_dir + "/cow_inventory_Qs/"+ "Q4.csv")
+cattle_inventory.head(2)
 
 # %%
 # totalBeefCowInv.head(3)
@@ -79,8 +83,6 @@ cattle_inventory.head(3)
 
 # %%
 cattle_inventory.iloc[1]
-
-# %%
 
 # %%
 feed_expense.head(2)
@@ -206,8 +208,6 @@ print (FarmOperation.data_item.unique())
 print (cattle_inventory.data_item.unique())
 
 # %%
-
-# %%
 bad_cols  = ["watershed", "watershed_code", 
              "domain", "domain_category", 
              "region", "period",
@@ -293,14 +293,7 @@ cattle_inventory.drop(bad_cols, axis="columns", inplace=True)
 AgLand.head(2)
 
 # %%
-# AgLand[AgLand['county_ansi'].isnull()]
-
-# %%
 feed_expense[(feed_expense.state=="CALIFORNIA") & (feed_expense.county=="SAN FRANCISCO")]
-
-# %%
-
-# %%
 
 # %%
 AgLand['county_ansi'].fillna(666, inplace=True)
@@ -325,8 +318,6 @@ for idx in AgLand.index:
 
 AgLand["county_fips"] = AgLand["state_ansi"] + AgLand["county_ansi"]
 AgLand[["state", "county", "state_ansi", "county_ansi", "county_fips"]].head(5)
-
-# %%
 
 # %%
 wetLand_area['county_ansi'].fillna(666, inplace=True)
@@ -454,7 +445,7 @@ wetLand_area.rename(
 )
 
 cattle_inventory.rename(
-    columns={"value": "cattle_cow_inventory", "cv_(%)": "cattle_cow_inventory_cv_(%)"},
+    columns={"value": "cattle_cow_beef_inventory", "cv_(%)": "cattle_cow_beef_inventory_cv_(%)"},
     inplace=True,
 )
 
@@ -478,15 +469,13 @@ print (wetLand_area.shape)
 
 # %%
 print (cattle_inventory.shape)
-cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_inventory")
+cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_beef_inventory")
 print (cattle_inventory.shape)
 
 # %%
 print (feed_expense.shape)
 feed_expense = rc.clean_census(df=feed_expense, col_="feed_expense")
 print (feed_expense.shape)
-
-# %%
 
 # %%
 # AgLand.to_csv(reOrganized_dir + "USDA_AgLand_cleaned_01.csv", index=False)
@@ -521,48 +510,3 @@ feed_expense.county_fips[1]
 # - Population/county (**missing. need to contact Census Bureau**)
 # - Percentage of irrigated acres
 # - FarmOperation not needed. NASS guy had created this.
-
-# %%
-CRP = wetLand_area.copy()
-
-# %%
-AgLand.head(5)
-
-# %%
-CRP.head(5)
-
-# %%
-feed_expense.head(5)
-
-# %%
-
-# %%
-a_file = "NDVI_SG_DL_6_SR_8.csv"
-a_file_split = a_file.split("_")
-
-# %%
-a_file = "SVM_NDVI_SG_NoneWeight_00_Desk_AccScor_SR8_train_ID6.csv"
-a_file_split = a_file.split("_")
-a_file_split[-1][2]
-
-# %%
-
-# %%
-mid_dir = "/Users/hn/Documents/01_research_data/RangeLand/Data/Min_Data/"
-econregion_gridmet_mean_indices = pd.read_csv(mid_dir + "econregion_gridmet_mean_indices.csv")
-
-# %%
-econregion_gridmet_mean_indices.head(2)
-
-# %%
-econregion_gridmet_mean_indices.econregion.unique()
-
-# %%
-econregion_gridmet_mean_indices[econregion_gridmet_mean_indices.econregion==0]
-
-# %%
-econregion_gridmet_mean_indices.columns
-
-# %%
-
-# %%

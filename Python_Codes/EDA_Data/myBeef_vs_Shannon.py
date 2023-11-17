@@ -275,8 +275,7 @@ axs[1].grid(axis="y", which="both")
 axs[2].grid(axis="y", which="both")
 
 ##########################################################################################
-sh_state_ = "TX"
-state_ = "Texas"
+sh_state_, state_ = "TX", "Texas"
 ##
 B = Q5_calves_state[Q5_calves_state.state == state_].copy()
 B.year = pd.to_datetime(B.year, format="%Y")
@@ -293,11 +292,13 @@ axs[0].plot(B.index, B.cattle_cow_inventory.values,
 del(B)
 ###
 axs[0].plot(pd.to_datetime(shannon_years, format="%Y"),
-     Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, shannon_years].values[0],
+            Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, 
+                                             shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon");
 
 axs[0].plot(pd.to_datetime(shannon_years, format="%Y"),
-shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, shannon_years].values[0],
+            shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, 
+                                                 shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon (Calves)", linestyle='dashed');
 ###
 B = Q4_beef_state[Q4_beef_state.state == state_].copy()
@@ -308,9 +309,7 @@ axs[0].plot(B.index, B.cattle_cows_beef_invt.values,
             c="k", linewidth=2, label=state_ + " Cattle beef inv.");
 del(B)
 ##########################################################################################
-sh_state_ = "MO"
-state_ = "Missouri"
-
+sh_state_, state_ = "MO", "Missouri"
 ### Calves
 B = Q5_calves_state[Q5_calves_state.state == state_].copy()
 B.year = pd.to_datetime(B.year, format="%Y")
@@ -327,11 +326,13 @@ axs[1].plot(B.index, B.cattle_cow_inventory.values,
 del(B)
 ### Shannon
 axs[1].plot(pd.to_datetime(shannon_years, format="%Y"),
-         Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, shannon_years].values[0],
+            Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, 
+                                             shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon");
 
 axs[1].plot(pd.to_datetime(shannon_years, format="%Y"),
-shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, shannon_years].values[0],
+            shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, 
+                                                 shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon (Calves)", linestyle='dashed');
 
 ###
@@ -343,8 +344,7 @@ axs[1].plot(B.index, B.cattle_cows_beef_invt.values,
             c="k", linewidth=2, label=state_ + " Cattle beef inv.");
 del(B)
 ##########################################################################################
-sh_state_ = "TN"
-state_ = "Tennessee"
+sh_state_, state_ = "TN", "Tennessee"
 ### Calves
 B = Q5_calves_state[Q5_calves_state.state == state_].copy()
 B.year = pd.to_datetime(B.year, format="%Y")
@@ -361,11 +361,13 @@ axs[2].plot(B.index, B.cattle_cow_inventory.values,
 del(B)
 ### Shannon
 axs[2].plot(pd.to_datetime(shannon_years, format="%Y"),
-         Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, shannon_years].values[0],
+            Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, 
+                                             shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon");
 
 axs[2].plot(pd.to_datetime(shannon_years, format="%Y"),
-shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, shannon_years].values[0],
+            shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, 
+                                                 shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon (Calves)", linestyle='dashed');
 ###
 B = Q4_beef_state[Q4_beef_state.state == state_].copy()
@@ -390,9 +392,7 @@ plt.savefig(fname = fig_name, dpi=400, bbox_inches='tight')
 fig, axs = plt.subplots(1, 1, figsize=(10, 3), sharex=False, gridspec_kw={"hspace": 0.35, "wspace": 0.05})
 axs.grid(axis="y", which="both")
 
-sh_state_ = "ID"
-state_ = "Idaho"
-
+sh_state_, state_ = "ID", "Idaho"
 ### Calves
 B = Q5_calves_state[Q5_calves_state.state == state_].copy()
 B.year = pd.to_datetime(B.year, format="%Y")
@@ -413,18 +413,26 @@ axs.plot(pd.to_datetime(shannon_years, format="%Y"),
             c="dodgerblue", linewidth=2, label=state_ + " Shannon");
 
 axs.plot(pd.to_datetime(shannon_years, format="%Y"),
-shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, shannon_years].values[0],
+         shannon_All_Cattle_Calves_CATINV.loc[shannon_All_Cattle_Calves_CATINV.state == sh_state_, 
+                                              shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon (Calves)", linestyle='dashed');
+
 ###
 B = Q4_beef_state[Q4_beef_state.state == state_].copy()
 B.year = pd.to_datetime(B.year, format="%Y")
 B.set_index("year", inplace=True)
 B.sort_index(inplace=True)
 axs.plot(B.index, B.cattle_cows_beef_invt.values,
-            c="k", linewidth=2, label=state_ + " Cattle beef inv.");
+         c="k", linewidth=2, label=state_ + " Cattle beef inv.");
 del(B)
-
+###
 axs.legend(loc="best");
 
 fig_name = plot_path + 'Idaho_inv.pdf'
 plt.savefig(fname = fig_name, dpi=400, bbox_inches='tight')
+
+# %%
+
+# %%
+
+# %%

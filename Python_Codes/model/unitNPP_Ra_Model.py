@@ -67,7 +67,7 @@ for x in SoI:
     SoI_abb = SoI_abb + [abb_dict["full_2_abb"][x]]
 
 # %%
-USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
+USDA_data = pd.read_pickle(reOrganized_dir + "USDA_data.sav")
 
 cattle_inventory = USDA_data["cattle_inventory"]
 
@@ -79,15 +79,17 @@ print (f"{cattle_inventory.commodity.unique() = }")
 print (f"{cattle_inventory.year.unique() = }")
 
 census_years = list(cattle_inventory.year.unique())
+
 # pick only useful columns
-cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_inventory"]]
+# cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_inventory"]]
+cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_beef_inventory"]]
 
 print (f"{len(cattle_inventory.county_fips.unique()) = }")
 cattle_inventory.head(2)
 
 # %%
 print (cattle_inventory.shape)
-cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_inventory")
+cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_beef_inventory")
 print (cattle_inventory.shape)
 
 # %% [markdown]
@@ -264,14 +266,12 @@ county_annual_NPP_Ra_cattleInv.reset_index(drop=True, inplace=True)
 county_annual_NPP_Ra_cattleInv.head(2)
 
 # %%
-
-# %%
 NPP_Ra_cattleInv_2017 = county_annual_NPP_Ra_cattleInv[
                                         county_annual_NPP_Ra_cattleInv.year==2017].copy()
 
 # %%
 expl_var_2017 = NPP_Ra_cattleInv_2017[["modis_npp", "rangeland_acre"]].values
-y_2017 = NPP_Ra_cattleInv_2017[["cattle_cow_inventory"]].values.reshape(-1)
+y_2017 = NPP_Ra_cattleInv_2017[["cattle_cow_beef_inventory"]].values.reshape(-1)
 print (f"{y_2017.shape = }")
 y_2017
 
@@ -300,12 +300,10 @@ intercept_2017 = solution_2017[2]
 NPP_Ra_cattleInv_2012 = county_annual_NPP_Ra_cattleInv[
                                         county_annual_NPP_Ra_cattleInv.year==2012].copy()
 
-y_2012 = NPP_Ra_cattleInv_2012[["cattle_cow_inventory"]].values.reshape(-1)
+y_2012 = NPP_Ra_cattleInv_2012[["cattle_cow_beef_inventory"]].values.reshape(-1)
 
-# expl_var_2012 = NPP_Ra_cattleInv_2012[["modis_npp", "rangeland_acre"]].values
-# expl_var_interc_2012 = np.hstack([expl_var_2012, np.ones(len(expl_var_2012)).reshape(-1, 1)])
-
-# %%
+expl_var_2012 = NPP_Ra_cattleInv_2012[["modis_npp", "rangeland_acre"]].values
+expl_var_interc_2012 = np.hstack([expl_var_2012, np.ones(len(expl_var_2012)).reshape(-1, 1)])
 expl_var_interc_2012
 
 # %%
@@ -321,8 +319,8 @@ RSS_2012_Model2017 = np.dot(res_2012_Model2017, res_2012_Model2017)
 RSS_2012_Model2017/len(expl_var_2012)
 
 # %%
-print (f"{NPP_Ra_cattleInv_2012.cattle_cow_inventory.min()=}")
-print (f"{NPP_Ra_cattleInv_2012.cattle_cow_inventory.max()=}")
+print (f"{NPP_Ra_cattleInv_2012.cattle_cow_beef_inventory.min()=}")
+print (f"{NPP_Ra_cattleInv_2012.cattle_cow_beef_inventory.max()=}")
 
 # %%
 

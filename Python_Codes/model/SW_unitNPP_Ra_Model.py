@@ -82,15 +82,17 @@ print (f"{cattle_inventory.year.unique() = }")
 
 census_years = list(cattle_inventory.year.unique())
 # pick only useful columns
-cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_inventory"]]
+cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_beef_inventory"]]
 
 print (f"{len(cattle_inventory.county_fips.unique()) = }")
 cattle_inventory.head(2)
 
 # %%
 print (cattle_inventory.shape)
-cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_inventory")
+cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_beef_inventory")
 print (cattle_inventory.shape)
+
+# it was 10,382. 
 
 # %% [markdown]
 # ### Min has an extra "1" as leading digit in FIPS!!
@@ -152,8 +154,8 @@ county_id_name_fips.reset_index(drop=True, inplace=True)
 county_id_name_fips.head(2)
 
 # %%
-print (f"{len(NPP.county_fips.unique()) = }")
-print (f"{len(seasonal_weather.county_fips.unique()) = }")
+print (f"{len(NPP.county_fips.unique()) = }") 
+print (f"{len(seasonal_weather.county_fips.unique()) = }") 
 
 # %%
 print (f"{NPP.shape = }")
@@ -173,6 +175,8 @@ county_id_name_fips.head(2)
 # %%
 print (f"{(NPP.year.unique()) = }")
 print (f"{len(NPP.county_fips.unique()) = }")
+
+# 2,095 when we had "cattle cow inv" instead of "cattle cow beef inv"
 print (f"{len(cattle_inventory.county_fips.unique()) = }")
 
 # %%
@@ -235,6 +239,7 @@ cattle_inventory_cnty_missing_from_NPP = [x for x in cattle_inventory.county_fip
 len(cattle_inventory_cnty_missing_from_NPP)
 
 # %%
+# 19 was missing when we had "cattle cow inv" instead of "cattle cow beef inv"
 NPP_cnty_missing_from_cattle = [x for x in county_annual_NPP_Ra.county_fips.unique()\
                                 if not(x in cattle_inventory.county_fips.unique())]
 len(NPP_cnty_missing_from_cattle)
@@ -252,6 +257,9 @@ print ("01001" in list(cattle_inventory.county_fips.unique()))
 
 # %%
 all_cattle_counties = set(cattle_inventory.county_fips.unique())
+# it was 
+# 2,093, 2076, 2064, 2051, 2045
+# when we had "cattle cow inv" instead of "cattle cow beef inv"
 print (f"{len(all_cattle_counties) = }")
 
 for a_year in sorted(cattle_inventory.year.unique()):
@@ -322,6 +330,7 @@ print (sorted(cattle_inventory.county_fips.unique()) == sorted(county_annual_NPP
 print (sorted(cattle_inventory.county_fips.unique()) == sorted(county_annual_SW_Ra.county_fips.unique()))
 
 # %%
+# 1,534 when we had "cattle cow inv" instead of "cattle cow beef inv"
 len(cattle_inventory.county_fips.unique())
 
 # %%
@@ -365,7 +374,7 @@ NPP_Ra_cattleInv_2017 = county_annual_NPP_Ra_cattleInv[
 
 # %%
 NPP_A_2017 = NPP_Ra_cattleInv_2017[["modis_npp", "rangeland_acre"]].values
-y_2017 = NPP_Ra_cattleInv_2017[["cattle_cow_inventory"]].values.reshape(-1)
+y_2017 = NPP_Ra_cattleInv_2017[["cattle_cow_beef_inventory"]].values.reshape(-1)
 print (f"{y_2017.shape = }")
 y_2017
 
@@ -394,13 +403,11 @@ intercept_2017 = NPP_sol_2017[2]
 NPP_Ra_cattleInv_2012 = county_annual_NPP_Ra_cattleInv[
                                         county_annual_NPP_Ra_cattleInv.year==2012].copy()
 
-y_2012 = NPP_Ra_cattleInv_2012[["cattle_cow_inventory"]].values.reshape(-1)
+y_2012 = NPP_Ra_cattleInv_2012[["cattle_cow_beef_inventory"]].values.reshape(-1)
 
+NPP_Ra_cattleInv_2012.head(2)
 # NP_A_2012 = NPP_Ra_cattleInv_2012[["modis_npp", "rangeland_acre"]].values
 # NP_A_2012 = np.hstack([NP_A_2012, np.ones(len(NP_A_2012)).reshape(-1, 1)])
-
-# %%
-NPP_Ra_cattleInv_2012.head(2)
 
 # %%
 NPP_yhat2012_Model2017 = NPP_coef_2017 * NPP_Ra_cattleInv_2012["modis_npp"].values + \
@@ -412,8 +419,8 @@ NPP_RSS2012_Model2017 = np.dot(NPP_res2012_Model2017, NPP_res2012_Model2017)
 NPP_RSS2012_Model2017/len(y_2012)
 
 # %%
-print (f"{NPP_Ra_cattleInv_2012.cattle_cow_inventory.min()=}")
-print (f"{NPP_Ra_cattleInv_2012.cattle_cow_inventory.max()=}")
+print (f"{NPP_Ra_cattleInv_2012.cattle_cow_beef_inventory.min()=}")
+print (f"{NPP_Ra_cattleInv_2012.cattle_cow_beef_inventory.max()=}")
 
 # %% [markdown]
 # ## Least Squares based on 2017 ```Weather```
@@ -425,7 +432,7 @@ SW_Ra_cattleInv_2017 = county_annual_SW_Ra_cattleInv[
 needed_cols = SW_Ra_cattleInv_2017.columns[2:11]
 print (needed_cols)
 SW_A_2017 = SW_Ra_cattleInv_2017[needed_cols].values
-y_2017 = SW_Ra_cattleInv_2017[["cattle_cow_inventory"]].values.reshape(-1)
+y_2017 = SW_Ra_cattleInv_2017[["cattle_cow_beef_inventory"]].values.reshape(-1)
 print (f"{y_2017.shape = }")
 y_2017
 
@@ -465,7 +472,7 @@ SW_var_cols = ['S1_countyMean_total_precip', 'S2_countyMean_total_precip',
 SW_Ra_cattleInv_2012 = county_annual_SW_Ra_cattleInv[
                                         county_annual_SW_Ra_cattleInv.year==2012].copy()
 
-y_2012 = SW_Ra_cattleInv_2012[["cattle_cow_inventory"]].values.reshape(-1)
+y_2012 = SW_Ra_cattleInv_2012[["cattle_cow_beef_inventory"]].values.reshape(-1)
 
 SW_A_2012 = SW_Ra_cattleInv_2012[SW_var_cols].values
 SW_A_2012 = np.hstack([SW_A_2012, np.ones(len(y_2012)).reshape(-1, 1)])
@@ -492,12 +499,6 @@ print('RSE from SW is {0:.0f}.'.format(np.sqrt(SW_RSS2012_Model2017/len(y_2012))
 SW_sol_2017
 
 # %%
-NPP_sol_2017
-
-# %%
-SW_var_cols
-
-# %%
 county_annual_SW_Ra_cattleInv.head(2)
 
 # %%
@@ -515,7 +516,7 @@ county_annual_SW_Ra_cattleInv.columns
 
 # %%
 NPP_needed_cols = ['year', 'county_fips', 'modis_npp', 'rangeland_acre',
-                   'county_area_acre', 'rangeland_fraction', 'cattle_cow_inventory']
+                   'county_area_acre', 'rangeland_fraction', 'cattle_cow_beef_inventory']
 
 SW_needed_cols = ['year', 'county_fips',
                   'S1_countyMean_total_precip', 'S2_countyMean_total_precip', 
@@ -542,10 +543,10 @@ cnty_ann_SW_NPP_Ra.head(2)
 import pickle
 from datetime import datetime
 
-filename = reOrganized_dir + "Min_NPP_SW_CommonCntyYear.sav"
+filename = reOrganized_dir + "Min_unitNPP_SW_CommonCntyYear.sav"
 
 export_ = {"cnty_ann_SW_NPP_Ra": cnty_ann_SW_NPP_Ra, 
-           "source_code" : "SW_NPP_Ra_Model",
+           "source_code" : "SW_unitNPP_Ra_Model",
            "Author": "HN",
            "Date" : datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
@@ -564,14 +565,14 @@ sns.displot(cnty_ann_SW_NPP_Ra.modis_npp, kde=True, kind='hist',
 
 # %%
 import seaborn as sns
-sns.displot(cnty_ann_SW_NPP_Ra.cattle_cow_inventory, kde=True, kind='hist',
+sns.displot(cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory, kde=True, kind='hist',
             bins=200, color = 'darkblue');
 
 # %%
 
 # %%
 sns.displot(data=cnty_ann_SW_NPP_Ra, 
-            x="modis_npp", y="cattle_cow_inventory", 
+            x="modis_npp", y="cattle_cow_beef_inventory", 
             kind="kde",
             height=5);
 
@@ -651,22 +652,19 @@ plt.rcParams.update(params)
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
 axes.grid(axis="y", which="both")
-axes.scatter(cnty_ann_SW_NPP_Ra.modis_npp, cnty_ann_SW_NPP_Ra.cattle_cow_inventory,s = 5)
+axes.scatter(cnty_ann_SW_NPP_Ra.modis_npp, cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory, s = 5)
 axes.set_xlabel("NPP");
 axes.set_ylabel("cow inventory");
 plt.show()
 
 # %%
-cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_inventory > 400000]
+cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory > 90000]
 
 # %%
 county_id_name_fips[county_id_name_fips.county_fips == "06107"]
 
 # %%
-cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_inventory > 200000]
-
-# %%
-large_cows_fips = list(cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_inventory > 200000].county_fips)
+large_cows_fips = list(cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory > 200000].county_fips)
 county_id_name_fips[county_id_name_fips.county_fips.isin(large_cows_fips)]
 
 # %%
@@ -699,13 +697,10 @@ axes.set_ylabel("NPP");
 plt.show()
 
 # %%
-cnty_ann_SW_NPP_Ra.head(2)
-
-# %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
 axes.grid(axis="y", which="both")
 axes.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre,
-             cnty_ann_SW_NPP_Ra.cattle_cow_inventory, 
+             cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory, 
              s = 5)
 
 axes.set_xlabel("rangeland acres");
@@ -714,7 +709,7 @@ axes.set_ylabel("cow count");
 plt.show()
 
 # %% [markdown]
-# # Residial Plots
+# # Residual Plots
 
 # %%
 
@@ -753,8 +748,7 @@ plt.show()
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
-ax1.grid(axis="y", which="both")
-ax2.grid(axis="y", which="both")
+ax1.grid(axis="y", which="both"); ax2.grid(axis="y", which="both")
 ##################################################
 ax1.scatter(SW_Ra_cattleInv_2012.rangeland_acre, NPP_res2012_Model2017, s = 5)
 ax1.set_xlabel("acre");
@@ -765,15 +759,11 @@ ax2.set_xlabel("acre");
 ax2.set_ylabel("SW_res2012_Model2017");
 
 plt.show()
-
-# %%
-NPP_A_2017
 
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
-ax1.grid(axis="y", which="both")
-ax2.grid(axis="y", which="both")
+ax1.grid(axis="y", which="both"); ax2.grid(axis="y", which="both")
 ##################################################
 ax1.scatter(SW_Ra_cattleInv_2012.rangeland_acre, NPP_res2012_Model2017, s = 5)
 ax1.set_xlabel("acre");
@@ -782,8 +772,11 @@ ax1.set_ylabel("NPP_res2012_Model2017");
 ax2.scatter(NPP_Ra_cattleInv_2012.rangeland_acre, SW_res2012_Model2017, s = 5)
 ax2.set_xlabel("acre");
 ax2.set_ylabel("SW_res2012_Model2017");
-
 plt.show()
+
+# %%
+
+# %%
 
 # %%
 

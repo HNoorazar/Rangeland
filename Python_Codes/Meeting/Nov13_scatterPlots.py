@@ -80,14 +80,14 @@ print (f"{cattle_inventory.year.unique() = }")
 
 census_years = list(cattle_inventory.year.unique())
 # pick only useful columns
-cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_inventory"]]
+cattle_inventory = cattle_inventory[["year", "county_fips", "cattle_cow_beef_inventory"]]
 
 print (f"{len(cattle_inventory.county_fips.unique()) = }")
 cattle_inventory.head(2)
 
 # %%
 print (cattle_inventory.shape)
-cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_inventory")
+cattle_inventory = rc.clean_census(df=cattle_inventory, col_="cattle_cow_beef_inventory")
 print (cattle_inventory.shape)
 
 # %% [markdown]
@@ -357,7 +357,7 @@ county_annual_SW_Ra_cattleInv.head(2)
 
 # %%
 NPP_needed_cols = ['year', 'county_fips', 'modis_npp', 'rangeland_acre',
-                   'county_area_acre', 'rangeland_fraction', 'cattle_cow_inventory']
+                   'county_area_acre', 'rangeland_fraction', 'cattle_cow_beef_inventory']
 
 SW_needed_cols = ['year', 'county_fips',
                   'S1_countyMean_total_precip', 'S2_countyMean_total_precip', 
@@ -376,7 +376,7 @@ cnty_ann_SW_NPP_Ra.head(2)
 
 # %%
 sns.displot(data=cnty_ann_SW_NPP_Ra, 
-            x="modis_npp", y="cattle_cow_inventory", 
+            x="modis_npp", y="cattle_cow_beef_inventory", 
             kind="kde",
             height=5);
 
@@ -401,13 +401,13 @@ plt.rcParams.update(params)
 # %%
 
 # %%
-cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_inventory > 400000]
+cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory > 400000]
 
 # %%
 county_id_name_fips[county_id_name_fips.county_fips == "06107"]
 
 # %%
-L = list(cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_inventory > 200000].county_fips)
+L = list(cnty_ann_SW_NPP_Ra[cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory > 200000].county_fips)
 county_id_name_fips[county_id_name_fips.county_fips.isin(L)]
 
 # %%
@@ -429,28 +429,22 @@ cnty_ann_SW_NPP_Ra.head(2)
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 (ax1, ax2) = axes;
 # ax1.grid(True); ax2.grid(True)
-ax1.grid(axis='y', which='both')
-ax2.grid(axis='y', which='both')
-
-
+ax1.grid(axis='y', which='both'); ax2.grid(axis='y', which='both')
 ##################################################
-
-ax1.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre,
-            cnty_ann_SW_NPP_Ra.cattle_cow_inventory, 
-             s = 5)
+ax1.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre, cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory, s = 5)
 
 ax1.set_xlabel("rangeland acre");
 ax1.set_ylabel("inventory");
 ##################################################
 
-ax2.scatter(cnty_ann_SW_NPP_Ra.modis_npp,
-            cnty_ann_SW_NPP_Ra.cattle_cow_inventory, 
-             s = 5)
+ax2.scatter(cnty_ann_SW_NPP_Ra.modis_npp, cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory, s = 5)
 
 ax2.set_xlabel("NPP");
 # ax2.set_ylabel("inventory");
-
 plt.show()
+
+# %%
+cnty_ann_SW_NPP_Ra
 
 # %%
 fig, axes = plt.subplots(3, 1, figsize=(10, 6), sharey=True, sharex=False)
@@ -459,8 +453,8 @@ ax1.grid(axis='y', which='both'); ax2.grid(axis='y', which='both'); ax3.grid(axi
 # ax1.grid(True); ax2.grid(True)
 sns.histplot(data=cnty_ann_SW_NPP_Ra.modis_npp, kde=True, color = 'darkblue', ax=ax1);
 
-sns.histplot(data=cnty_ann_SW_NPP_Ra.cattle_cow_inventory, kde=True, color = 'darkblue', ax=ax2);
-small_inven = cnty_ann_SW_NPP_Ra.loc[cnty_ann_SW_NPP_Ra.cattle_cow_inventory<75000, "cattle_cow_inventory"]
+sns.histplot(data=cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory, kde=True, color = 'darkblue', ax=ax2);
+small_inven = cnty_ann_SW_NPP_Ra.loc[cnty_ann_SW_NPP_Ra.cattle_cow_beef_inventory<75000, "cattle_cow_beef_inventory"]
 sns.histplot(data=small_inven, kde=True, color = 'darkblue', ax=ax3);
 plt.xlabel("");
 
@@ -468,10 +462,7 @@ plt.xlabel("");
 
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(5, 5), sharey=True)
-axes.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre,
-             cnty_ann_SW_NPP_Ra.modis_npp, 
-             s = 5)
-
+axes.scatter(cnty_ann_SW_NPP_Ra.rangeland_acre, cnty_ann_SW_NPP_Ra.modis_npp, s = 5)
 axes.set_xlabel("rangeland_acre");
 axes.set_ylabel("modis_npp");
 

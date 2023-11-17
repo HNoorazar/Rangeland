@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -67,7 +67,7 @@ for x in SoI:
     SoI_abb = SoI_abb + [abb_dict["full_2_abb"][x]]
 
 # %%
-USDA_data = pickle.load(open(reOrganized_dir + "USDA_data.sav", "rb"))
+USDA_data = pd.read_pickle(reOrganized_dir + "USDA_data.sav")
 
 cattle_inventory = USDA_data["cattle_inventory"]
 
