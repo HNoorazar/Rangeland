@@ -15,7 +15,17 @@
 # %% [markdown]
 # ## Nov 7.
 #
-# On Nov. 6 Mike wanted to model cattle inventory using only ```NPP``` and rangeland area for one year.
+# - ```SW```: Seasonal Weather: temp. and precip.
+#
+# On Nov. 6 Mike wanted to model cattle inventory using only ```NPP```/```SW``` and rangeland area for one year.
+#
+# **Min's data are inconsistent:** Let us subset the counties that are in common between ```NPP``` and ```SW```, and cattle inventory.
+#
+# #### Seasons in Tonsor are
+# - S1: Jan - Mar
+# - S2: Apr - Jul
+# - S3: Aug - Sep
+# - S4: Oct - Dec
 
 # %%
 import pandas as pd
