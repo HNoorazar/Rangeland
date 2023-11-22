@@ -72,4 +72,10 @@ def correct_Mins_FIPS(df, col_):
     """
     df[col_] = df[col_].astype("str")
     df[col_] = df[col_].str.slice(1)
+
+    ## if county name is missing, that is for
+    ## all of state. or sth. drop them. They have ' ' in them, no NA!
+    if "county_name" in df.columns:
+        df = df[df.county_name != " "].copy()
+        df.reset_index(drop=True, inplace=True)
     return df

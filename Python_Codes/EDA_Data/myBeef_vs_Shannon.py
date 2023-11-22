@@ -409,7 +409,8 @@ axs.plot(B.index, B.cattle_cow_inventory.values,
 del(B)
 ###    Shannon
 axs.plot(pd.to_datetime(shannon_years, format="%Y"),
-         Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, shannon_years].values[0],
+         Shannon_Beef_Cows_fromCATINV.loc[Shannon_Beef_Cows_fromCATINV.state == sh_state_, 
+                                          shannon_years].values[0],
             c="dodgerblue", linewidth=2, label=state_ + " Shannon");
 
 axs.plot(pd.to_datetime(shannon_years, format="%Y"),

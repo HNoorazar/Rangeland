@@ -368,7 +368,6 @@ print (f"{sorted(cattle_inventory.year.unique())     = }")
 print (sorted(cattle_inventory.county_fips.unique()) == sorted(county_annual_NPP_Ra.county_fips.unique()))
 print (sorted(cattle_inventory.county_fips.unique()) == sorted(county_annual_SW_Ra.county_fips.unique()))
 
-# %%
 len(cattle_inventory.county_fips.unique())
 
 # %%
