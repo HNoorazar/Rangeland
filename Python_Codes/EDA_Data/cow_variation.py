@@ -414,6 +414,7 @@ print ("SD.  of change is [{}%].".format(s_))
 del(s_)
 
 # %%
+  
 
 # %%
 print (("\033[1m" + "In all counties over all years (absolute values):" + "\033[0m"))
