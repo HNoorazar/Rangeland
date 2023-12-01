@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.5
+#       jupytext_version: 1.15.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -237,9 +237,7 @@ county_RA_and_TA_fraction.head(5)
 
 # %%
 county_RA_and_TA_fraction.rename(columns={"fips_id": "county_fips"}, inplace=True)
-county_RA_and_TA_fraction = rc.correct_Mins_FIPS(
-    df=county_RA_and_TA_fraction, col_="county_fips"
-)
+county_RA_and_TA_fraction = rc.correct_Mins_FIPS(df=county_RA_and_TA_fraction, col_="county_fips")
 county_RA_and_TA_fraction.head(2)
 
 # %%
@@ -249,9 +247,7 @@ county_annual_NPP_Ra = pd.merge(
 county_annual_NPP_Ra.head(2)
 
 # %%
-county_annual_SW_Ra = pd.merge(
-    seasonal_weather, county_RA_and_TA_fraction, on=["county_fips"], how="left"
-)
+county_annual_SW_Ra = pd.merge(seasonal_weather, county_RA_and_TA_fraction, on=["county_fips"], how="left")
 county_annual_SW_Ra.head(2)
 
 # %%
@@ -431,9 +427,7 @@ county_annual_SW_Ra_cattleInv.head(2)
 # ## Least Squares based on 2017 ```NPP```
 
 # %%
-NPP_Ra_cattleInv_2017 = county_annual_NPP_Ra_cattleInv[
-    county_annual_NPP_Ra_cattleInv.year == 2017
-].copy()
+NPP_Ra_cattleInv_2017 = county_annual_NPP_Ra_cattleInv[county_annual_NPP_Ra_cattleInv.year == 2017].copy()
 
 # %%
 NPP_A_2017 = NPP_Ra_cattleInv_2017[["modis_npp", "rangeland_acre"]].values
@@ -447,9 +441,7 @@ print(NPP_A_2017.shape)
 NPP_A_2017
 
 # %%
-NPP_sol_2017, NPP_RSS_2017, NPP_rank_2017, NPP_singular_vals_2017 = np.linalg.lstsq(
-    NPP_A_2017, y_2017
-)
+NPP_sol_2017, NPP_RSS_2017, NPP_rank_2017, NPP_singular_vals_2017 = np.linalg.lstsq(NPP_A_2017, y_2017)
 
 # %%
 county_annual_NPP_Ra_cattleInv[county_annual_NPP_Ra_cattleInv.year == 2017].head(2)
@@ -887,6 +879,8 @@ ax2.scatter(NPP_Ra_cattleInv_2012.rangeland_acre, SW_res2012_Model2017, s=5)
 ax2.set_xlabel("acre")
 ax2.set_ylabel("SW_res2012_Model2017")
 plt.show()
+
+# %%
 
 # %%
 

@@ -79,3 +79,16 @@ def correct_Mins_FIPS(df, col_):
         df = df[df.county_name != " "].copy()
         df.reset_index(drop=True, inplace=True)
     return df
+
+
+
+def correct_4digitFips(df, col_):
+    df[col_] = df[col_].astype('str')
+    for idx in df.index:
+        if len(df.loc[idx, col_]) == 4:
+            df.loc[idx, col_] = "0" + df.loc[idx, col_]
+    return df
+
+
+
+
