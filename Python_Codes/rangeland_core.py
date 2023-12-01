@@ -92,3 +92,11 @@ def correct_4digitFips(df, col_):
 
 
 
+def correct_3digitStateFips_Min(df, col_):
+    # Min has an extra 1 in his data. just get rid of it.
+    df[col_] = df[col_].astype('str')
+    df[col_] = df[col_].str.slice(1, 3)
+    return df
+
+
+
