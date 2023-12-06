@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.15.2
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -17,7 +17,23 @@
 #
 # Mike and I met in my office. Looked at annual plots of inventories.
 # Then saw a big dip in annual data that will be missed on cencus data.
-# So, here we model annual data
+# So, here we model annual data.
+#
+#
+# On Dec 5. Mike and I had a follow up and talked about the next step.
+#
+# - **Hypothesis** Decline in inventory from time $t$ to $t+1$ if ```NPP``` at $t$ was below average.
+#
+# What about lag tho? He had mentioned earlier maybe people make changes 3 years after a drought.
+#
+# - Annual State Level
+# - Add Washington, Utah, Arizona, Nevada
+# - Find some examples that inventory goes down sharply at time $t+1$ and look at NPP at time $t$.
+#
+# - $y-$variable should be deltas: $y_{t+1} = I_{t+1} - I_t$ where $I$ is for inventory.
+# Under this scenario independent variables can be also deltas or $x_t$ corresponds to $y_{t+1}$. In this notebook
+# we will go with the latter scenario.
+#
 
 # %%
 import shutup
@@ -48,14 +64,14 @@ reOrganized_dir = data_dir_base + "reOrganized/"
 # # Read
 
 # %%
-SoI = ["Alabama", "Arkansas", "California", 
+SoI = ["Alabama", "Arizona", "Arkansas", "California", 
        "Colorado", "Florida", "Georgia", 
        "Idaho", "Illinois", "Iowa", 
        "Kansas", "Kentucky", "Louisiana", 
        "Mississippi", "Missouri", "Montana", 
-       "Nebraska", "New Mexico", "North Dakota", 
+       "Nebraska", "Nevada", "New Mexico", "North Dakota", 
        "Oklahoma", "Oregon", "South Dakota", 
-       "Tennessee", "Texas", "Virginia", 
+       "Tennessee", "Texas", "Utah", "Virginia", "Washington",
        "Wyoming"]
 
 abb_dict = pd.read_pickle(param_dir + "state_abbreviations.sav")
@@ -83,11 +99,10 @@ county_id_name_fips["state_fip"] = county_id_name_fips.county_fips.str.slice(0, 
 county_id_name_fips.head(2)
 
 # %%
-
-# %%
-herbRatio = pd.read_csv(data_dir_base + "Supriya/Nov30_HerbRatio/herbRatio.csv")
+herbRatio = pd.read_csv(data_dir_base + "Supriya/Nov30_HerbRatio/state_herb_ratio.csv")
+herbRatio = rc.correct_state_int_fips_to_str(df=herbRatio, col_="state_fip")
+herbRatio.sort_values(by=["state_fip"], inplace=True)
 herbRatio.dropna(how="any", inplace=True)
-herbRatio = rc.correct_4digitFips(df=herbRatio, col_="county_fips")
 herbRatio.head(2)
 
 # %%
@@ -104,24 +119,9 @@ NPP.head(2)
 
 # %%
 # Rangeland area and Total area:
-county_RA_and_TA_fraction = pd.read_csv(reOrganized_dir + "county_rangeland_and_totalarea_fraction.csv")
-county_RA_and_TA_fraction.rename(columns={"fips_id": "county_fips"}, inplace=True)
-
-county_RA_and_TA_fraction = rc.correct_Mins_FIPS(df=county_RA_and_TA_fraction, col_="county_fips")
-L = len(county_RA_and_TA_fraction.county_fips.unique())
-print ("number of counties are {}.".format(L))
-print (county_RA_and_TA_fraction.shape)
-county_RA_and_TA_fraction.head(2)
-
-# %%
-county_RA_and_TA_fraction["state_fip"] = county_RA_and_TA_fraction.county_fips.str.slice(0, 2)
-county_RA_and_TA_fraction.head(2)
-
-# %%
-state_RA = county_RA_and_TA_fraction[["state_fip", "rangeland_acre"]].groupby("state_fip").sum()
-state_RA.reset_index(drop=False, inplace=True)
-state_RA = state_RA[state_RA.state_fip.isin(county_id_name_fips.state_fip)]
-state_RA.reset_index(drop=True, inplace=True)
+state_RA = pd.read_pickle(reOrganized_dir + "state_RA_area.sav")
+state_RA = state_RA["state_RA_area"]
+print (len(state_RA.state_fip.unique()) == len(state_RA.state_fip))
 state_RA.head(2)
 
 # %%
@@ -157,6 +157,5 @@ shannon_annual.reset_index(drop=True, inplace=True)
 shannon_annual.head(2)
 
 # %%
-shannon_annual.transpose.size()
 
 # %%

@@ -6,7 +6,7 @@ from pprint import pprint
 import os, os.path, sys
 
 
-def covert_unitNPP_2_toal(NPP_df, npp_col_, area_col_, new_col_):
+def covert_unitNPP_2_total(NPP_df, npp_col_, area_col_, new_col_):
     meterSq_2_acr = 0.000247105
     NPP_df[new_col_] = (NPP_df[npp_col_] * NPP_df[area_col_]) / meterSq_2_acr
     return NPP_df
@@ -81,22 +81,25 @@ def correct_Mins_FIPS(df, col_):
     return df
 
 
-
 def correct_4digitFips(df, col_):
-    df[col_] = df[col_].astype('str')
+    df[col_] = df[col_].astype("str")
     for idx in df.index:
         if len(df.loc[idx, col_]) == 4:
             df.loc[idx, col_] = "0" + df.loc[idx, col_]
     return df
 
 
-
-
 def correct_3digitStateFips_Min(df, col_):
     # Min has an extra 1 in his data. just get rid of it.
-    df[col_] = df[col_].astype('str')
+    df[col_] = df[col_].astype("str")
     df[col_] = df[col_].str.slice(1, 3)
     return df
 
 
-
+def correct_state_int_fips_to_str(df, col_):
+    # Min has an extra 1 in his data. just get rid of it.
+    df[col_] = df[col_].astype("str")
+    for idx in df.index:
+        if (len(df.loc[idx, col_])) == 1:
+            df.loc[idx, col_] = "0" + df.loc[idx, col_]
+    return df

@@ -503,6 +503,11 @@ pickle.dump(export_, open(filename, 'wb'))
 # %%
 feed_expense.county_fips[1]
 
+# %%
+len(cattle_inventory.county_fips.unique())
+
+# %%
+
 # %% [markdown]
 # # Tonsor
 # - CRP
