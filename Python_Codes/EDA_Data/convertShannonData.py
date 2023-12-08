@@ -36,7 +36,6 @@ EX_sheet_names = EX_sheet_names[1:]
 EX_sheet_names
 
 # %%
-CATINV_df = pd.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False)
 
 # %%
 ii = 0
@@ -64,11 +63,95 @@ curr_sheet.dropna(axis=0, how = 'all', inplace = True)
 # Drop rows where state is NA
 curr_sheet.dropna(subset=['state'], inplace = True)
 Beef_Cows_CATINV = curr_sheet.copy()
+# Beef_Cows_CATINV.sort_values(by=["state"], inplace=True)
 Beef_Cows_CATINV.tail(4)
+
+# %%
+print(sorted(Beef_Cows_CATINV.state.unique()))
+
+# %%
+Beef_Cows_CATINV.shape
 
 # %%
 out_name = reOrganized_dir + "Shannon_Beef_Cows_fromCATINV.csv"
 Beef_Cows_CATINV.to_csv(out_name, index = False)
+
+# %%
+years = list(Beef_Cows_CATINV.columns[1:])
+num_years = len(years)
+
+CATINV_df_tall = pd.DataFrame(data=None, index=range(num_years*len(Beef_Cows_CATINV.state.unique())), 
+                              columns=["state", "year", "inventory"], 
+                              dtype=None, copy=False)
+
+idx_ = 0 
+for a_state in Beef_Cows_CATINV.state.unique():
+    curr = Beef_Cows_CATINV[Beef_Cows_CATINV.state == a_state]
+    CATINV_df_tall.loc[idx_: idx_ + num_years - 1 , "inventory"] = curr[years].values[0]
+    CATINV_df_tall.loc[idx_: idx_ + num_years - 1 , "state"] = a_state
+    CATINV_df_tall.loc[idx_: idx_ + num_years - 1 , "year"] = years
+    idx_ = idx_ + num_years
+
+
+# %%
+CATINV_df_tall.head(5)
+
+# %%
+CATINV_df_tall[CATINV_df_tall.state!="US"].tail(5)
+
+# %%
+Beef_Cows_CATINV[Beef_Cows_CATINV.state=="WY"]
+
+# %%
+
+# %%
+import sys
+sys.path.append("/Users/hn/Documents/00_GitHub/Rangeland/Python_Codes/")
+import rangeland_core as rc
+
+
+county_id_name_fips = pd.read_csv(Min_data_dir_base + "county_id_name_fips.csv")
+county_id_name_fips.rename(columns=lambda x: x.lower().replace(' ', '_'), inplace=True)
+
+county_id_name_fips.sort_values(by=["state", "county"], inplace=True)
+
+county_id_name_fips = rc.correct_Mins_FIPS(df=county_id_name_fips, col_="county")
+county_id_name_fips.rename(columns={"county": "county_fips"}, inplace=True)
+
+county_id_name_fips["state_fip"] = county_id_name_fips.county_fips.str.slice(0, 2)
+
+print (len(county_id_name_fips.state.unique()))
+
+county_id_name_fips = county_id_name_fips.drop(columns=["county_name", "county_fips", "fips"])
+county_id_name_fips.drop_duplicates(inplace=True)
+county_id_name_fips.reset_index(drop=True, inplace=True)
+county_id_name_fips.head(2)
+
+# %%
+CATINV_df_tall.head(2)
+
+# %%
+CATINV_df_tall = pd.merge(CATINV_df_tall, county_id_name_fips, on = ["state"], how = "left")
+CATINV_df_tall.head(2)
+
+# %%
+CATINV_df_tall.year = CATINV_df_tall.year.astype(int)
+
+# %%
+CATINV_df_tall.head(2)
+
+# %%
+from datetime import datetime
+import pickle
+
+filename = reOrganized_dir + "Shannon_Beef_Cows_fromCATINV_tall.sav"
+
+export_ = {"CATINV_annual_tall": CATINV_df_tall, 
+           "source_code" : "convertShannonData",
+           "Author": "HN",
+           "Date" : datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
+pickle.dump(export_, open(filename, 'wb'))
 
 # %% [markdown]
 # ### We just need sheet A (beef cows) from ```Annual Cattle Inventory by State.xlsx```

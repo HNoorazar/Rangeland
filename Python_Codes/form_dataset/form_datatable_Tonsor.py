@@ -567,7 +567,7 @@ A[A.state.isin(A.state.unique()[20:])].groupby("state")["cattle_cow_inventory"].
 A[A.state == "Texas"]
 
 # %%
-Beef_Cows_fromCATINV = pd.read_csv(reOrganized_dir + "Beef_Cows_fromCATINV.csv")
+Beef_Cows_fromCATINV = pd.read_csv(reOrganized_dir + "Shannon_Beef_Cows_fromCATINV.csv")
 Beef_Cows_fromCATINV.head(2)
 
 # %%
