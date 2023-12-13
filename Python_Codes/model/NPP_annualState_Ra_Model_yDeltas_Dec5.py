@@ -197,10 +197,14 @@ county_id_name_fips[county_id_name_fips.state_fip == "21"].state.unique()
 
 # %%
 prod_test = pd.read_csv(Min_data_base + "statefips_annual_productivity.csv")
-print(sorted(prod_test.statefips90m.unique()))
+prod_test.statefips90m = prod_test.statefips90m.astype(str)
+prod_test["state_fip"] = prod_test.statefips90m.str.slice(0, 2)
+print(sorted(prod_test.state_fip.unique()))
 
 # %%
-NPP.head(2)
+county_id_name_fips[county_id_name_fips.state == "TN"] 
+
+# %%
 
 # %%
 state_RA.head(2)

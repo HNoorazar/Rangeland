@@ -113,7 +113,6 @@ county_id_name_fips.sort_values(by=["state", "county"], inplace=True)
 county_id_name_fips = rc.correct_Mins_FIPS(df=county_id_name_fips, col_="county")
 county_id_name_fips.rename(columns={"county": "county_fips"}, inplace=True)
 
-
 county_id_name_fips.reset_index(drop=True, inplace=True)
 print(len(county_id_name_fips.state.unique()))
 county_id_name_fips.head(2)
@@ -205,11 +204,12 @@ NPP.head(2)
 # %%
 state_RA.head(2)
 
-# %%
-state_NPP_Ra = pd.merge(NPP, state_RA, on=["state_fip"], how="left")
-state_NPP_Ra.head(2)
+# %% [markdown]
+# ### Convert Unit NPP to State Level
 
 # %%
+state_NPP_Ra = pd.merge(NPP, state_RA, on=["state_fip"], how="left")
+
 state_NPP_Ra = rc.covert_unitNPP_2_total(NPP_df=state_NPP_Ra, npp_col_="modis_npp",
                                          area_col_="rangeland_acre", new_col_="state_rangeland_npp")
 
@@ -217,18 +217,55 @@ state_NPP_Ra = rc.covert_unitNPP_2_total(NPP_df=state_NPP_Ra, npp_col_="modis_np
 state_NPP_Ra.drop(columns=["modis_npp"], inplace=True)
 state_NPP_Ra.head(2)
 
-# %%
-herb.head(2)
+# %% [markdown]
+# ### Compute NPP deltas
+#
+# But I'm not sure if this would work since some lags are longer than 1 year!
 
 # %%
-state_NPP_Ra_herb = pd.merge(
-    state_NPP_Ra, herb[["state_fip", "herb_avg"]], on=["state_fip"], how="left"
+npp_states = state_NPP_Ra.state_fip.unique()
+npp_years = state_NPP_Ra.year.unique()
+
+npp_delta_df = pd.DataFrame(index = np.arange(len(npp_states)*(len(npp_years)-1)),
+                           columns = ["state_fip", "year", "npp_delta"])
+
+npp_delta_df.year = npp_delta_df.year.astype(str)
+npp_delta_df.state_fip = npp_delta_df.state_fip.astype(str)
+npp_delta_df.npp_delta = npp_delta_df.npp_delta.astype(float)
+
+idx_ = 0
+for a_state in npp_states:
+    curr_df = state_NPP_Ra[state_NPP_Ra.state_fip == a_state].copy()
+    curr_df.sort_values(by=["year"], inplace=True)
+    
+    npp_deltas = curr_df["state_rangeland_npp"][1:].values - curr_df["state_rangeland_npp"][0:-1] .values
+    yr_deltas  = curr_df.year.astype(str).values[1:] + "-" + curr_df.year.astype(str).values[0:-1] 
+    
+    npp_delta_df.loc[idx_:idx_+len(npp_deltas)-1, "npp_delta"] = npp_deltas
+    npp_delta_df.loc[idx_:idx_+len(npp_deltas)-1, "year"] = yr_deltas
+    npp_delta_df.loc[idx_:idx_+len(npp_deltas)-1, "state_fip"] = a_state
+    idx_ += len(npp_deltas)
+    
+npp_delta_df.head(2)
+
+# %%
+del(NPP, state_NPP_Ra)
+
+# %%
+state_NPPdelta_Ra = pd.merge(npp_delta_df, state_RA, on=["state_fip"], how="left")
+state_NPPdelta_Ra.head(2)
+
+# %%
+
+# %%
+state_NPPdelta_Ra_herb = pd.merge(
+    state_NPPdelta_Ra, herb[["state_fip", "herb_avg"]], on=["state_fip"], how="left"
 )
 
-state_NPP_Ra_herb.head(2)
+state_NPPdelta_Ra_herb.head(2)
 
 # %%
-print(sorted(state_NPP_Ra_herb.year.unique()))
+print(sorted(state_NPPdelta_Ra_herb.year.unique()))
 
 # %% [markdown]
 # # Read inventory deltas
@@ -259,76 +296,35 @@ Shannon_CATINV_deltas.drop(columns=["state"], inplace=True)
 Shannon_CATINV_deltas.head(2)
 
 # %%
-state_NPP_Ra_herb.head(2)
-
-# %% [markdown]
-# ### Change years' labels in state_NPP_Ra_herb
-#
-# So that we can merge dataframes. But do not forget what you are doing.
-
-# %%
-state_NPP_Ra_herb.year = state_NPP_Ra_herb.year.astype(str)
-
-# %%
-for idx_ in state_NPP_Ra_herb.index:
-    yr = state_NPP_Ra_herb.loc[idx_, "year"]
-    state_NPP_Ra_herb.loc[idx_, "year"] = str(int(yr) + 1) + "-" + str(int(yr))
-
-state_NPP_Ra_herb.sort_values(by=["state_fip", "year"], inplace=True)
-state_NPP_Ra_herb.reset_index(drop=True, inplace=True)
-
-# %%
-state_NPP_Ra_herb.tail(3)
+state_NPPdelta_Ra_herb.head(2)
 
 # %%
 Shannon_CATINV_deltas.tail(3)
 
 # %%
-ccc_ = ["state_fip", "year", "rangeland_acre", "state_rangeland_npp", "herb_avg"]
+ccc_ = ["state_fip", "year", "rangeland_acre", "npp_delta", "herb_avg"]
 
-state_NPP_Ra_herb_InvenDelta = pd.merge(
-    state_NPP_Ra_herb[ccc_],
-    Shannon_CATINV_deltas,
-    on=["state_fip", "year"],
-    how="left",
-)
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %% [markdown]
-# ### "normalize" NPP
-#
-# Let $\mu = \text{NPP}_{avg}$ then compute $(\text{NPP} - \mu) / \mu$
+state_NPPdelta_Ra_herb_InvenDelta = pd.merge(state_NPPdelta_Ra_herb[ccc_], Shannon_CATINV_deltas,
+                                             on=["state_fip", "year"], how="left")
+state_NPPdelta_Ra_herb_InvenDelta.head(2)
 
 # %%
-npp_mean = state_NPP_Ra_herb_InvenDelta.state_rangeland_npp.mean()
-state_NPP_Ra_herb_InvenDelta["state_normal_npp"] = (
-    state_NPP_Ra_herb_InvenDelta["state_rangeland_npp"] - npp_mean
-) / npp_mean
-
-state_NPP_Ra_herb_InvenDelta.head(2)
 
 # %%
-state_NPP_Ra_herb_InvenDelta = pd.merge(state_NPP_Ra_herb_InvenDelta, county_id_name_fips,
-                                        on=["state_fip"], how="left")
-state_NPP_Ra_herb_InvenDelta.head(2)
+state_NPPdelta_Ra_herb_InvenDelta = pd.merge(state_NPPdelta_Ra_herb_InvenDelta, county_id_name_fips,
+                                             on=["state_fip"], how="left")
+state_NPPdelta_Ra_herb_InvenDelta.head(2)
 
 # %%
-new_order = [
-    "state",
-    "state_fip",
-    "year",
-    "state_normal_npp",
-    "rangeland_acre",
-    "herb_avg",
-    "inventory_delta",
-    "state_rangeland_npp",
-]
+new_order = ["state", "state_fip",
+             "year", "npp_delta",
+             "rangeland_acre", "herb_avg", "inventory_delta"]
 
-state_NPP_Ra_herb_InvenDelta = state_NPP_Ra_herb_InvenDelta[new_order]
-state_NPP_Ra_herb_InvenDelta.head(2)
+state_NPPdelta_Ra_herb_InvenDelta = state_NPPdelta_Ra_herb_InvenDelta[new_order]
+state_NPPdelta_Ra_herb_InvenDelta.head(2)
 
 # %%
-len(state_NPP_Ra_herb_InvenDelta.state.unique())
+len(state_NPPdelta_Ra_herb_InvenDelta.state.unique())
 
 # %%
 tick_legend_FontSize = 8
@@ -351,87 +347,45 @@ plt.rcParams["ytick.labelleft"] = True
 plt.rcParams.update(params)
 
 # %%
-fig, axes = plt.subplots(2, 1, figsize=(8, 4.5), sharey=False, sharex=False)
-(ax1, ax2) = axes
+fig, ax1 = plt.subplots(1, 1, figsize=(8, 2.5), sharey=False, sharex=False)
 ax1.grid(axis="y", which="both")
-ax2.grid(axis="y", which="both")
 
-var = "state_normal_npp"
-sns.histplot(data=state_NPP_Ra_herb_InvenDelta[var],
+var = "npp_delta"
+sns.histplot(data=state_NPPdelta_Ra_herb_InvenDelta[var],
              kde=True, bins=200, color="darkblue", ax=ax1)
 
-# ax1.title("Linear graph")
 ax1.title.set_text(var.replace("_", " ") + " density")
-
-A = state_NPP_Ra_herb_InvenDelta[state_NPP_Ra_herb_InvenDelta[var] > 0]
-sns.histplot(data=A[var], kde=True, bins=200, color="darkblue", ax=ax2)
-ax2.title.set_text("positive " + var.replace("_", " ") + " density")
-
-ax1.set_xlabel("")
-ax2.set_xlabel(var.replace("_", " "))
+ax1.set_xlabel(var.replace("_", " "))
 fig.tight_layout()
 
 # %%
-state_NPP_Ra_herb_InvenDelta[
-    state_NPP_Ra_herb_InvenDelta.state_normal_npp < 0
-].state.unique()
-
-# %%
-state_NPP_Ra_herb_InvenDelta[
-    state_NPP_Ra_herb_InvenDelta.state_normal_npp > 1
-].state.unique()
-
-# %%
-fig, axes = plt.subplots(2, 1, figsize=(8, 4.5), sharey=False, sharex=False)
-(ax1, ax2) = axes
-ax1.grid(axis="y", which="both")
-ax2.grid(axis="y", which="both")
-
-var = "state_normal_npp"
-sns.histplot(data=state_NPP_Ra_herb_InvenDelta[var],
-             kde=True, bins=200, color="darkblue", ax=ax1)
-
-# ax1.title("Linear graph")
-ax1.title.set_text(var.replace("_", " ") + " density")
-
-sns.histplot(data=1 / (state_NPP_Ra_herb_InvenDelta[var]),
-             kde=True, bins=200, color="darkblue", ax=ax2)
-ax2.title.set_text("1/(" + var.replace("_", " ") + ")" + " density")
-
-ax1.set_xlabel("")
-ax2.set_xlabel(var.replace("_", " "))
-fig.tight_layout()
+from scipy import stats
 
 # %%
 fig, axes = plt.subplots(1, 1, figsize=(10, 2), sharey=False, sharex=False)
 axes.grid(axis="y", which="both")
 
 var = "inventory_delta"
-sns.histplot(
-    data=state_NPP_Ra_herb_InvenDelta[var],
-    kde=True,
-    bins=200,
-    color="darkblue",
-    ax=axes,
-)
+sns.histplot(data=state_NPPdelta_Ra_herb_InvenDelta[var],
+             kde=True, bins=200, color="darkblue", ax=axes)
 axes.title.set_text(var.replace("_", " ") + " density")
 
-axes.set_xlabel(var.replace("_", " "))
+axes.set_xlabel(var.replace("_", " "));
 
 # %% [markdown]
 # ## Model
 
 # %%
-state_NPP_Ra_herb_InvenDelta.head(2)
+state_NPPdelta_Ra_herb_InvenDelta.head(2)
 
 # %%
-print(state_NPP_Ra_herb_InvenDelta.year.unique().min())
-yr_max = state_NPP_Ra_herb_InvenDelta.year.unique().max()
+print(state_NPPdelta_Ra_herb_InvenDelta.year.unique().min())
+yr_max = state_NPPdelta_Ra_herb_InvenDelta.year.unique().max()
 print(yr_max)
 
 # %%
-train_df = state_NPP_Ra_herb_InvenDelta[state_NPP_Ra_herb_InvenDelta.year < yr_max].copy()
-test_df  = state_NPP_Ra_herb_InvenDelta[state_NPP_Ra_herb_InvenDelta.year == yr_max].copy()
+train_df = state_NPPdelta_Ra_herb_InvenDelta[state_NPPdelta_Ra_herb_InvenDelta.year < yr_max].copy()
+test_df  = state_NPPdelta_Ra_herb_InvenDelta[state_NPPdelta_Ra_herb_InvenDelta.year == yr_max].copy()
 
 # %%
 test_df.year.unique()
@@ -443,7 +397,7 @@ train_df.year.unique().max()
 train_df.head(2)
 
 # %%
-indp_vars_ = ["state_normal_npp", "rangeland_acre", "herb_avg"]
+indp_vars_ = ["npp_delta", "rangeland_acre", "herb_avg"]
 train_A = train_df[indp_vars_].values
 train_A = np.hstack([train_A, np.ones(len(train_A)).reshape(-1, 1)])
 print(train_A.shape)
@@ -485,199 +439,8 @@ print("    RSS_test = {0:.0f}.".format(NPP_RSS_test))
 print("    MSE_test = {0:.0f}.".format(NPP_MSE_test))
 print("    RSE =  {0:.0f}.".format(NPP_RSE_test))
 
-# %% [markdown]
-# ### Transform for nomal distribution
+# %%
 
 # %%
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-state_NPP_Ra_herb_InvenDelta["inverse_state_normal_npp"] = (1 / state_NPP_Ra_herb_InvenDelta["state_normal_npp"])
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-print(state_NPP_Ra_herb_InvenDelta.inverse_state_normal_npp.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.inverse_state_normal_npp.max().round(2))
-
-# %%
-print(state_NPP_Ra_herb_InvenDelta.rangeland_acre.min())
-print(state_NPP_Ra_herb_InvenDelta.rangeland_acre.max())
-
-# %%
-fig, axes = plt.subplots(2, 1, figsize=(8, 4.5), sharey=False, sharex=False)
-(ax1, ax2) = axes
-ax1.grid(axis="y", which="both")
-ax2.grid(axis="y", which="both")
-
-var = "rangeland_acre"
-sns.histplot(
-    data=state_NPP_Ra_herb_InvenDelta[var],
-    kde=True,
-    bins=200,
-    color="darkblue",
-    ax=ax1,
-)
-
-# ax1.title("Linear graph")
-ax1.title.set_text(var.replace("_", " ") + " density")
-
-sns.histplot(
-    data=np.log10(state_NPP_Ra_herb_InvenDelta[var]),
-    kde=True,
-    bins=200,
-    color="darkblue",
-    ax=ax2,
-)
-ax2.title.set_text("log10(" + var.replace("_", " ") + ")" + " density")
-
-ax1.set_xlabel("")
-ax2.set_xlabel(var.replace("_", " "))
-fig.tight_layout()
-
-# %%
-state_NPP_Ra_herb_InvenDelta["log_rangeland_acre"] = np.log10(state_NPP_Ra_herb_InvenDelta["rangeland_acre"])
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-print(state_NPP_Ra_herb_InvenDelta.log_rangeland_acre.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.log_rangeland_acre.max().round(2))
-print ()
-print(state_NPP_Ra_herb_InvenDelta.inverse_state_normal_npp.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.inverse_state_normal_npp.max().round(2))
-
-print ()
-print(state_NPP_Ra_herb_InvenDelta.herb_avg.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.herb_avg.max().round(2))
-print ()
-print(state_NPP_Ra_herb_InvenDelta.inventory_delta.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.inventory_delta.max().round(2))
-
-# %% [markdown]
-# # Normalize other columns as well?
-#
-#  - inventory delta loos like long tail normal. No transformation. Just normalize for scale purposes.
-
-# %%
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-inv_delta_mean = state_NPP_Ra_herb_InvenDelta["inventory_delta"].mean()
-state_NPP_Ra_herb_InvenDelta["normal_inventory_delta"] = (
-    state_NPP_Ra_herb_InvenDelta["inventory_delta"] - inv_delta_mean
-) / inv_delta_mean
-
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-print(state_NPP_Ra_herb_InvenDelta.inventory_delta.min())
-print(state_NPP_Ra_herb_InvenDelta.inventory_delta.max())
-
-print(state_NPP_Ra_herb_InvenDelta.normal_inventory_delta.min())
-print(state_NPP_Ra_herb_InvenDelta.normal_inventory_delta.max())
-
-# %%
-RA_mean = state_NPP_Ra_herb_InvenDelta["rangeland_acre"].mean()
-state_NPP_Ra_herb_InvenDelta["normal_RA"] = (state_NPP_Ra_herb_InvenDelta["rangeland_acre"] - RA_mean) / RA_mean
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-state_NPP_Ra_herb_InvenDelta.drop(columns=["normal_RA"], inplace=True)
-
-# %%
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-print("state_normal_npp")
-print(state_NPP_Ra_herb_InvenDelta.state_normal_npp.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.state_normal_npp.max().round(2))
-print()
-print("inverse_state_normal_npp")
-print(state_NPP_Ra_herb_InvenDelta.inverse_state_normal_npp.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.inverse_state_normal_npp.max().round(2))
-print()
-print("log_rangeland_acre")
-print(state_NPP_Ra_herb_InvenDelta.log_rangeland_acre.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.log_rangeland_acre.max().round(2))
-print()
-print("herb_avg")
-print(state_NPP_Ra_herb_InvenDelta.herb_avg.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.herb_avg.max().round(2))
-print()
-print("inventory_delta")
-print(state_NPP_Ra_herb_InvenDelta.inventory_delta.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.inventory_delta.max().round(2))
-print()
-print("normal_inventory_delta")
-print(state_NPP_Ra_herb_InvenDelta.normal_inventory_delta.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.normal_inventory_delta.max().round(2))
-
-# %%
-print(NPP.modis_npp.min().round(2))
-print(NPP.modis_npp.max().round(2))
-
-# %% [markdown]
-# ## New Model
-#
-# Before we did
-#
-# ```indp_vars_ = ["normal_npp", "rangeland_acre", "herb_avg"]```
-#
-# **Now**
-#
-# ```indp_vars_ = ["normal_npp", "log_rangeland_acre", "herb_avg"]```
-
-# %%
-train_df = state_NPP_Ra_herb_InvenDelta[
-    state_NPP_Ra_herb_InvenDelta.year < yr_max
-].copy()
-test_df = state_NPP_Ra_herb_InvenDelta[
-    state_NPP_Ra_herb_InvenDelta.year == yr_max
-].copy()
-
-# %%
-indp_vars_ = ["state_normal_npp", "log_rangeland_acre", "herb_avg"]
-
-train_A = train_df[indp_vars_].values
-train_A = np.hstack([train_A, np.ones(len(train_A)).reshape(-1, 1)])
-print(train_A.shape)
-
-y_var = "inventory_delta"
-
-train_y = train_df[y_var].values.reshape(-1).astype("float")
-
-# %%
-NPP_sol, NPP_RSS, NPP_rank, NPP_singular_vals = np.linalg.lstsq(train_A, train_y)
-
-# %% [markdown]
-# ### Apply to test set
-
-# %%
-test_A = test_df[indp_vars_].values
-test_A = np.hstack([test_A, np.ones(len(test_A)).reshape(-1, 1)])
-y_test = test_df[[y_var]].values.reshape(-1)
-
-# %%
-yhat_test = test_A @ NPP_sol
-
-
-# %%
-NPP_test_res = y_test - yhat_test
-NPP_RSS_test = np.dot(NPP_test_res, NPP_test_res)
-NPP_MSE_test = NPP_RSS_test / len(y_test)
-NPP_RSE_test = np.sqrt(NPP_MSE_test)
-
-print("    RSS_test = {0:.0f}.".format(NPP_RSS_test))
-print("    MSE_test = {0:.0f}.".format(NPP_MSE_test))
-print("    RSE =  {0:.0f}.".format(NPP_RSE_test))
-
-# %%
-print(state_NPP_Ra_herb_InvenDelta.state_normal_npp.min().round(2))
-print(state_NPP_Ra_herb_InvenDelta.state_normal_npp.max().round(2))
-
-# %%
-state_NPP_Ra_herb_InvenDelta.head(2)
-
-# %%
-state_NPP_Ra_herb_InvenDelta.head(5)
 
 # %%

@@ -19,12 +19,16 @@ shutup.please()
 
 import pandas as pd
 import numpy as np
+import statistics
+
 from datetime import datetime
 import os, os.path, pickle, sys
-import seaborn as sns
 
+import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+from matplotlib.dates import MonthLocator, DateFormatter
 
 sys.path.append("/Users/hn/Documents/00_GitHub/Rangeland/Python_Codes/")
 import rangeland_core as rc
@@ -174,7 +178,11 @@ ax0T = axs[ii].twinx()  # instantiate a second axes that shares the same x-axis
 color_ = 'tab:red'
 ax0T.set_ylabel('NPP', color=color_)  # we already handled the x-label with ax1
 ax0T.plot(B.year, B.state_rangeland_npp, c=color_, linewidth=3, label="NPP");
-ax0T.axhline(y = B.state_rangeland_npp.mean(), color =color_, linestyle = '-.', linewidth=2)
+
+mu, std_ = B.state_rangeland_npp.mean(), statistics.stdev(B.state_rangeland_npp)
+ax0T.axhline(y = mu, color =color_, linestyle = '-.', linewidth=2)
+ax0T.axhspan(mu-std_, mu+std_, alpha=0.2, color="tab:red")
+
 ax0T.tick_params(axis='y')
 axs[ii].legend(loc="lower right");
 ####################################
@@ -189,10 +197,13 @@ ax0T = axs[ii].twinx()  # instantiate a second axes that shares the same x-axis
 color_ = 'tab:red'
 ax0T.set_ylabel('NPP', color=color_)  # we already handled the x-label with ax1
 ax0T.plot(B.year, B.state_rangeland_npp, c=color_, linewidth=3, label="NPP");
-ax0T.axhline(y = B.state_rangeland_npp.mean(), color =color_, linestyle = '-.', linewidth=2)
+
+mu, std_ = B.state_rangeland_npp.mean(), statistics.stdev(B.state_rangeland_npp)
+ax0T.axhline(y = mu, color =color_, linestyle = '-.', linewidth=2)
+ax0T.axhspan(mu-std_, mu+std_, alpha=0.2, color="tab:red")
+
 ax0T.tick_params(axis='y')
 axs[ii].legend(loc="lower right");
-
 ####################################
 ii = 2
 state_ = chosen_states[ii]
@@ -204,8 +215,13 @@ axs[ii].set_ylabel('inventory', color=color_)
 ax0T = axs[ii].twinx()  # instantiate a second axes that shares the same x-axis
 color_ = 'tab:red'
 ax0T.set_ylabel('NPP', color=color_)  # we already handled the x-label with ax1
+
+mu, std_ = B.state_rangeland_npp.mean(), statistics.stdev(B.state_rangeland_npp)
 ax0T.plot(B.year, B.state_rangeland_npp, c=color_, linewidth=3, label="NPP");
-ax0T.axhline(y = B.state_rangeland_npp.mean(), color =color_, linestyle = '-.', linewidth=2)
+ax0T.axhline(y = mu , color =color_, linestyle = '-.', linewidth=2)
+
+ax0T.axhspan(mu-std_, mu+std_, alpha=0.2, color="tab:red")
+
 ax0T.tick_params(axis='y')
 axs[ii].legend(loc="lower right");
 
@@ -220,8 +236,12 @@ axs[ii].set_ylabel('inventory', color=color_)
 ax0T = axs[ii].twinx()  # instantiate a second axes that shares the same x-axis
 color_ = 'tab:red'
 ax0T.set_ylabel('NPP', color=color_)  # we already handled the x-label with ax1
+
 ax0T.plot(B.year, B.state_rangeland_npp, c=color_, linewidth=3, label="NPP");
-ax0T.axhline(y = B.state_rangeland_npp.mean(), color =color_, linestyle = '-.', linewidth=2)
+mu = B.state_rangeland_npp.mean()
+std_ = statistics.stdev(B.state_rangeland_npp)
+ax0T.axhline(y = mu, color =color_, linestyle = '-.', linewidth=2)
+ax0T.axhspan(mu-std_, mu+std_, alpha=0.2, color="tab:red")
 
 ax0T.tick_params(axis='y')
 axs[ii].legend(loc="lower right");
@@ -239,13 +259,14 @@ ax0T.set_ylabel('NPP', color=color_)  # we already handled the x-label with ax1
 ax0T.plot(B.year, B.state_rangeland_npp, c=color_, linewidth=3, label="NPP");
 ax0T.tick_params(axis='y')
 axs[ii].legend(loc="lower right");
-ax0T.axhline(y = B.state_rangeland_npp.mean(), color =color_, linestyle = '-.', linewidth=2)
-
+mu = B.state_rangeland_npp.mean()
+std_ = statistics.stdev(B.state_rangeland_npp)
+ax0T.axhline(y = mu, color =color_, linestyle = '-.', linewidth=2)
+ax0T.axhspan(mu-std_, mu+std_, alpha=0.2, color="tab:red")
 
 axs[ii].set_xticks(B.year, B.year, rotation=90)
 
-import matplotlib.dates as mdates
-from matplotlib.dates import MonthLocator, DateFormatter
+
 # axs[ii].xaxis.set_major_locator(mdates.YearLocator())
 # axs[ii].xaxis.set_major_formatter(DateFormatter("%b"))
     
@@ -264,8 +285,25 @@ plt.savefig(fname=fig_name, dpi=100, bbox_inches="tight")
 
 # %%
 
+
+v = B.state_rangeland_npp
+vcentered = v - v.mean()
+vcentered_norm = np.linalg.norm(vcentered)
+
+print (f"{v.std()                          = }")
+print (f"{statistics.stdev(v)              = }")
+print (f"{vcentered_norm/np.sqrt(len(v)-1) = }")
+
+print()
+print (f"{np.std(v)                        = }")
+print (f"{vcentered_norm/np.sqrt(len(v))   = }")
+
 # %%
-state_NPP_invent[state_NPP_invent.state=="TX"]["inventory"][1:].values - \
-state_NPP_invent[state_NPP_invent.state=="TX"]["inventory"][0:-1].values
+
+# %%
+
+# %%
+
+# %%
 
 # %%
