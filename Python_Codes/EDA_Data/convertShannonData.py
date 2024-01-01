@@ -115,7 +115,7 @@ county_id_name_fips.rename(columns=lambda x: x.lower().replace(' ', '_'), inplac
 
 county_id_name_fips.sort_values(by=["state", "county"], inplace=True)
 
-county_id_name_fips = rc.correct_Mins_FIPS(df=county_id_name_fips, col_="county")
+county_id_name_fips = rc.correct_Mins_county_FIPS(df=county_id_name_fips, col_="county")
 county_id_name_fips.rename(columns={"county": "county_fips"}, inplace=True)
 
 county_id_name_fips["state_fip"] = county_id_name_fips.county_fips.str.slice(0, 2)
@@ -139,6 +139,8 @@ CATINV_df_tall.year = CATINV_df_tall.year.astype(int)
 
 # %%
 CATINV_df_tall.head(2)
+
+# %%
 
 # %%
 from datetime import datetime

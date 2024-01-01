@@ -158,15 +158,15 @@ NPP.head(2)
 
 # %%
 state_NPP_Ra = pd.merge(NPP, state_RA, on=["state_fip"], how="left")
+state_NPP_Ra.head(2)
 
-state_NPP_Ra = rc.covert_unitNPP_2_total(NPP_df=state_NPP_Ra, npp_col_="modis_npp",
-                                         area_col_="rangeland_acre", new_col_="state_rangeland_npp")
+# %%
+state_NPP_Ra = rc.covert_unitNPP_2_total(NPP_df=state_NPP_Ra, npp_unit_col_="modis_npp",
+                                         acr_area_col_="rangeland_acre", npp_area_col_="state_rangeland_npp")
 
 ### Security check to not make mistake later:
 state_NPP_Ra.drop(columns=["modis_npp"], inplace=True)
 state_NPP_Ra.head(2)
-
-# %%
 
 # %% [markdown]
 # ### Read Inventory
@@ -369,7 +369,7 @@ train_df.head(2)
 standard_indp = preprocessing.scale(train_df[indp_vars])
 
 # %%
-std_cols = [i + j for i, j in zip(indp_vars, ["_standardized"]*3)]
+std_cols = [i + j for i, j in zip(indp_vars, ["_standardized"] * len(indp_vars))]
 std_cols
 
 # %%
@@ -448,6 +448,7 @@ print (f"{statistics.stdev(v)              = }")
 print (f"{vcentered_norm/np.sqrt(len(v)-1) = }")
 
 print()
+print (f"{v.std(ddof=0)                    = }")
 print (f"{np.std(v)                        = }")
 print (f"{vcentered_norm/np.sqrt(len(v))   = }")
 

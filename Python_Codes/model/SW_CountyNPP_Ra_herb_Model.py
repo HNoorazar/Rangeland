@@ -328,11 +328,8 @@ print(len(county_annual_NPP_Ra.county_fips.unique()))
 print(len(county_annual_SW_Ra.county_fips.unique()))
 
 # %%
-cattle_inventory_cnty_missing_from_NPP = [
-    x
-    for x in cattle_inventory.county_fips.unique()
-    if not (x in county_annual_NPP_Ra.county_fips.unique())
-]
+cattle_inventory_cnty_missing_from_NPP = [x for x in cattle_inventory.county_fips.unique()
+                                          if not (x in county_annual_NPP_Ra.county_fips.unique())]
 len(cattle_inventory_cnty_missing_from_NPP)
 
 # %%

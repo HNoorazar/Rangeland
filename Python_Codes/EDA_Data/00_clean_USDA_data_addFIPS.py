@@ -69,7 +69,7 @@ feed_expense = pd.read_csv(USDA_data_dir + "feed_expense.csv")
 # cattle_inventory = pd.read_csv(USDA_data_dir + "cattle_inventory.csv")
 
 # Q4:
-cattle_inventory = pd.read_csv(USDA_data_dir + "/cow_inventory_Qs/"+ "Q4.csv")
+cattle_inventory = pd.read_csv(USDA_data_dir + "/cow_inventory_Qs/"+ "Q4_Updated_AZ_WA.csv")
 cattle_inventory.head(2)
 
 # %%
@@ -152,7 +152,6 @@ print (feed_expense.domain.unique())
 print (FarmOperation.domain.unique())
 print (cattle_inventory.domain.unique())
 print ()
-
 print (AgLand.watershed_code.unique())
 print (wetLand_area.watershed_code.unique())
 print (feed_expense.watershed_code.unique())
@@ -212,7 +211,6 @@ bad_cols  = ["watershed", "watershed_code",
              "domain", "domain_category", 
              "region", "period",
              "week_ending", "zip_code", "program", "geo_level"]
-
 
 meta_cols = ["state", "county", "county_ansi", "state_ansi", "ag_district_code"]
 
@@ -515,3 +513,5 @@ len(cattle_inventory.county_fips.unique())
 # - Population/county (**missing. need to contact Census Bureau**)
 # - Percentage of irrigated acres
 # - FarmOperation not needed. NASS guy had created this.
+
+# %%

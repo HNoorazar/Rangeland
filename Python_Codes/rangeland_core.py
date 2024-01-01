@@ -6,9 +6,42 @@ from pprint import pprint
 import os, os.path, sys
 
 
-def covert_unitNPP_2_total(NPP_df, npp_col_, area_col_, new_col_):
-    meterSq_2_acr = 0.000247105
-    NPP_df[new_col_] = (NPP_df[npp_col_] * NPP_df[area_col_]) / meterSq_2_acr
+def covert_unitNPP_2_total(NPP_df, npp_unit_col_, acr_area_col_, npp_area_col_):
+    """
+    Convert the unit NPP to total area.
+    Total area can be area of rangeland in a county or an state
+
+    Units are Kg * C / m^2
+
+    1 m^2 = 0.000247105 acres
+
+    Arguments
+    ---------
+    NPP_df : dataframe
+           whose one column is unit NPP
+
+    npp_unit_col_ : str
+           name of the unit NPP column
+
+    acr_area_col_ : str
+           name of the column that gives area in acres
+
+    npp_area_col_ : str
+           name of new column that will have total NPP
+
+    Returns
+    -------
+    NPP_df : dataframe
+           the dataframe that has a new column in it: total NPP
+
+    """
+    meterSq_to_acr = 0.000247105
+    acr_2_m2 = 4046.862669715303
+    NPP_df["area_m2"] = NPP_df[acr_area_col_] * acr_2_m2
+    NPP_df[npp_area_col_] = NPP_df[npp_unit_col_] * NPP_df["area_m2"]
+    # NPP_df[npp_area_col_] = (
+    #     NPP_df[npp_unit_col_] * NPP_df[acr_area_col_]
+    # ) / meterSq_to_acr
     return NPP_df
 
 
@@ -63,7 +96,7 @@ def clean_census(df, col_):
     return df
 
 
-def correct_Mins_FIPS(df, col_):
+def correct_Mins_county_FIPS(df, col_):
     """
     Min has added a leading 1 to FIPS
     since some FIPs starts with 0.
@@ -82,6 +115,11 @@ def correct_Mins_FIPS(df, col_):
 
 
 def correct_4digitFips(df, col_):
+    """
+    If the leading digit is zero, it will be gone.
+    So, county FIPS can end up being 4 digit.
+    We add zero back and FIPS will be string.
+    """
     df[col_] = df[col_].astype("str")
     for idx in df.index:
         if len(df.loc[idx, col_]) == 4:
