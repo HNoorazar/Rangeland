@@ -159,8 +159,10 @@ NPP.head(2)
 # %%
 state_NPP_Ra = pd.merge(NPP, state_RA, on=["state_fip"], how="left")
 
-state_NPP_Ra = rc.covert_unitNPP_2_total(NPP_df=state_NPP_Ra, npp_col_="modis_npp",
-                                         area_col_="rangeland_acre", new_col_="state_rangeland_npp")
+state_NPP_Ra = rc.covert_unitNPP_2_total(NPP_df=state_NPP_Ra, 
+                                         npp_unit_col_="modis_npp",
+                                         acr_area_col_="rangeland_acre", 
+                                         npp_area_col_="state_rangeland_npp")
 
 ### Security check to not make mistake later:
 state_NPP_Ra.drop(columns=["modis_npp"], inplace=True)
@@ -400,5 +402,49 @@ print (start_b + "Test residuals for 3-years-NPP, RA, herb ratio, and dummy east
 print("    RSS_test = {0:.0f}.".format(NPP_RSS_test))
 print("    MSE_test = {0:.0f}.".format(NPP_MSE_test))
 print("    RSE =  {0:.0f}.".format(NPP_RSE_test))
+
+# %% [markdown]
+# ### Normalize and model with $\ln(y)$
+
+# %%
+invent_tall.head(2)
+
+# %%
+all_indp_vars = ["NPP_3", "NPP_2", "NPP_1", "rangeland_acre", "herb_avg"]
+all_indp_vars = sorted(all_indp_vars)
+all_indp_vars
+
+# %%
+# standard_indp = preprocessing.scale(all_df[explain_vars_herb]) # this is biased
+normal_df = (invent_tall[all_indp_vars] - invent_tall[all_indp_vars].mean()) / \
+                         invent_tall[all_indp_vars].std(ddof=1)
+normal_df.head(2)
+
+# %%
+normal_cols = [i + j for i, j in zip(all_indp_vars, ["_normal"] * len(all_indp_vars))]
+normal_cols
+
+# %%
+invent_tall[normal_cols] = normal_df
+invent_tall.head(2)
+
+# %%
+X_normal = invent_tall[normal_cols]
+X_normal = sm.add_constant(X_normal)
+Y = np.log(invent_tall[y_var].astype(float))
+ks_normal = sm.OLS(Y, X_normal)
+ks_normal_result =ks_normal.fit()
+ks_normal_result.summary()
+
+# %%
+X_normal = invent_tall[normal_cols]
+X_normal = sm.add_constant(X_normal)
+Y = (invent_tall[y_var].astype(float))
+ks_normal = sm.OLS(Y, X_normal)
+ks_normal_result =ks_normal.fit()
+ks_normal_result.summary()
+
+# %%
+6.38e+05 - 2.14e+05
 
 # %%
