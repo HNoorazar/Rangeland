@@ -45,23 +45,25 @@ def covert_unitNPP_2_total(NPP_df, npp_unit_col_, acr_area_col_, npp_area_col_):
     return NPP_df
 
 
-def census_stateCntyAnsi_2_countyFips(df):
-    df["state_ansi"] = df["state_ansi"].astype("int32")
-    df["county_ansi"] = df["county_ansi"].astype("int32")
+def census_stateCntyAnsi_2_countyFips(
+    df, state_fip_col="state_ansi", county_fip_col="county_ansi"
+):
+    df[state_fip_col] = df[state_fip_col].astype("int32")
+    df[county_fip_col] = df[county_fip_col].astype("int32")
 
-    df["state_ansi"] = df["state_ansi"].astype("str")
-    df["county_ansi"] = df["county_ansi"].astype("str")
+    df[state_fip_col] = df[state_fip_col].astype("str")
+    df[county_fip_col] = df[county_fip_col].astype("str")
 
     for idx in df.index:
-        if len(df.loc[idx, "state_ansi"]) == 1:
-            df.loc[idx, "state_ansi"] = "0" + df.loc[idx, "state_ansi"]
+        if len(df.loc[idx, state_fip_col]) == 1:
+            df.loc[idx, state_fip_col] = "0" + df.loc[idx, state_fip_col]
 
-        if len(df.loc[idx, "county_ansi"]) == 1:
-            df.loc[idx, "county_ansi"] = "00" + df.loc[idx, "county_ansi"]
-        elif len(df.loc[idx, "county_ansi"]) == 2:
-            df.loc[idx, "county_ansi"] = "0" + df.loc[idx, "county_ansi"]
+        if len(df.loc[idx, county_fip_col]) == 1:
+            df.loc[idx, county_fip_col] = "00" + df.loc[idx, county_fip_col]
+        elif len(df.loc[idx, county_fip_col]) == 2:
+            df.loc[idx, county_fip_col] = "0" + df.loc[idx, county_fip_col]
 
-    df["county_fips"] = df["state_ansi"] + df["county_ansi"]
+    df["county_fips"] = df[state_fip_col] + df[county_fip_col]
     return df
 
 
